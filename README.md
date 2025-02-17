@@ -1,2 +1,3 @@
 # dashboard-v2
-Next.js Dashboard Course App Upgradd
+Next.js Dashboard Course App Upgrade
+
