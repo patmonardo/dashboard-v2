@@ -5,6 +5,7 @@ node_modules
 
 # testing
 coverage
+.playwright/
 
 # next.js
 .next/
@@ -17,6 +18,7 @@ dist
 *.pem
 .env
 .env.*
+!.env.example
 
 # debug
 npm-debug.log*
@@ -31,6 +33,12 @@ next-env.d.ts
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+!.vscode/launch.json
+.idea/
 
 # Prisma
 /prisma/*.db
+/prisma/migrations/*_init/
+
+# Reference material
+nextjs-dashboard/
