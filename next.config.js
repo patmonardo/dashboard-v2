@@ -1,19 +1,8 @@
-/** @type {import("next").NextConfig} */
-const config = {
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/all',
-        permanent: false,
-      },
-    ];
-  },
+const path = require('path');
 
-  /** We run eslint as a separate task in CI */
-  eslint: {
-    ignoreDuringBuilds: !!process.env.CI,
-  },
-};
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+}
 
-module.exports = config;
+module.exports = nextConfig;

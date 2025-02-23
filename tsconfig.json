@@ -2,7 +2,7 @@
   "compilerOptions": {
     /* Base Options: */
     "skipLibCheck": true,
-    "target": "es2022",
+    "target": "esnext",
     "allowJs": true,
     "moduleDetection": "force",
     "isolatedModules": true,
@@ -10,16 +10,17 @@
     "strict": true,
     "checkJs": true,
     "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
     /* Bundled projects */
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "ES2022"
+    "types": [
+      "jest", // Keep jest here
+      "node" // Add node types for Jest
     ],
     "noEmit": true,
-    "module": "Preserve",
-    "moduleResolution": "bundler",
-    "jsx": "preserve",
+    "module": "CommonJS", // Change to CommonJS
+    "moduleResolution": "node", // Change to node
+    "esModuleInterop": true,
+    "jsx": "preserve", // Recommended for Next.js
     "plugins": [
       {
         "name": "next"
@@ -28,21 +29,18 @@
     "incremental": true,
     /* Path aliases */
     "paths": {
-      "@/*": [
-        "./app/*"
-      ],
-      "@/ui/*": [
-        "./app/ui/*"
-      ],
-      "@/lib/*": [
-        "./app/lib/*"
-      ],
-      "@/server/*": [
-        "./app/server/*"
-      ]
-    }
+      "@/*": ["./app/*"],
+    },
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "resolveJsonModule": true
   },
   "include": [
+    "src/**/*",
+    "test/**/*",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
