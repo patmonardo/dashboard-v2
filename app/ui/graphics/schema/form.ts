@@ -10,12 +10,12 @@ export const FormContentSchema = z.enum(['jsx', 'html', 'json', 'xml']).default(
 export const FormModeSchema = z.enum(['create', 'edit']).default('create');
 
 // Form elements
-export const FormElementSchema = z.object({
+export const FormFieldSchema = z.object({
   id: z.string(),
-  type: z.enum(['text', 'email', 'number', 'select', 'date']),
+  type: z.string(),
   label: z.string(),
-  defaultValue: z.string().optional(),
   required: z.boolean().default(false),
+  defaultValue: z.string().optional(),
 })
 
 // Form actions
@@ -42,7 +42,7 @@ export const FormStateSchema = z.object({
 // Form shape
 export const FormShapeSchema = z.object({
   layout: FormLayoutSchema,
-  elements: z.array(FormElementSchema),
+  fields: z.array(FormFieldSchema),
   state: FormStateSchema,
 })
 
@@ -50,7 +50,7 @@ export const FormShapeSchema = z.object({
 export type FormMatter = z.infer<typeof FormMatterSchema>;
 export type FormContent = z.infer<typeof FormContentSchema>;
 export type FormMode = z.infer<typeof FormModeSchema>;
-export type FormElement = z.infer<typeof FormElementSchema>
+export type FormField = z.infer<typeof FormFieldSchema>
 export type FormAction = z.infer<typeof FormActionSchema>
 export type FormLayout = z.infer<typeof FormLayoutSchema>
 export type FormState = z.infer<typeof FormStateSchema>

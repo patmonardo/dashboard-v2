@@ -1,46 +1,47 @@
-import React from 'react';
+import React from "react";
 import type {
   FormMatter,
   FormMode,
   FormState,
   FormShape,
-  FormContent
-  } from '@/ui/graphics/schema/form'
-import { FormShapeAdapter } from '@/ui/graphics/adapters';
+  FormContent,
+} from "@/ui/graphics/schema/form";
+import { FormShapeAdapter } from "@/ui/graphics/adapters";
 
 export abstract class Form<T extends FormShape> {
   protected state: FormState = {
-    status: 'idle'
-  }
+    status: "idle",
+  };
 
-  constructor(protected readonly data?: FormMatter) { }
+  constructor(protected readonly data?: FormMatter) {}
 
-  protected abstract create(): T
-  protected abstract edit(): T
+  protected abstract create(): T;
+  protected abstract edit(): T;
 
   abstract getFormShape(mode: FormMode): T;
 
   render(mode: FormMode, format: FormContent): any {
-    let shape: T
+    let shape: T;
     switch (mode) {
-      case 'create':
-        shape = this.getFormShape('create');
+      case "create":
+        shape = this.getFormShape("create");
         break;
-      case 'edit':
-        shape = this.getFormShape('edit');
+      case "edit":
+        shape = this.getFormShape("edit");
         break;
       default:
         throw new Error(`Unsupported mode: ${mode}`);
     }
+    console.log("render", mode, format);
     switch (format) {
-      case 'jsx':
+      case "jsx":
         return this.renderJSX(shape, this.data);
-      case 'json':
+      case "json":
         return this.renderJSON(shape, this.data);
-      case 'html':
+      case "html":
         return this.renderHTML(shape, this.data);
-      case 'xml':
-          return this.renderXML(shape, this.data);
+      case "xml":
+        return this.renderXML(shape, this.data);
       default:
         throw new Error(`Unsupported format: ${format}`);
     }
@@ -65,7 +66,7 @@ export abstract class Form<T extends FormShape> {
   setState(state: Partial<FormState>) {
     this.state = {
       ...this.state,
-      ...state
-    }
+      ...state,
+    };
   }
 }

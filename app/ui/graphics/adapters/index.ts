@@ -1,9 +1,9 @@
 import React from 'react';
 import type { FormShape, FormMatter } from '@/ui/graphics/schema/form';
-import { ShapeToJSXAdapter } from './jsx';
 import { ShapeToJSONAdapter } from './json';
 import { ShapeToHTMLAdapter } from './html';
 import { ShapeToXMLAdapter } from './xml';
+import { ShapeToJSXAdapter } from './jsx';
 
 export class FormShapeAdapter {
   static toJSX(shape: FormShape, data: FormMatter): React.ReactNode {

@@ -13,11 +13,10 @@
     "forceConsistentCasingInFileNames": true,
     /* Bundled projects */
     "types": [
-      "jest", // Keep jest here
       "node" // Add node types for Jest
     ],
     "noEmit": true,
-    "module": "CommonJS", // Change to CommonJS
+    "module": "esnext", // Change to CommonJS
     "moduleResolution": "node", // Change to node
     "esModuleInterop": true,
     "jsx": "preserve", // Recommended for Next.js

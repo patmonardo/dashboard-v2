@@ -1,25 +1,25 @@
-import { FormElement, FormShape } from '@/ui/graphics/schema/form';
+import { FormField, FormShape } from '@/ui/graphics/schema/form';
 
 export class ShapeToHTMLAdapter {
   static toHTML(shape: FormShape, data?: any): string {
     let html = `<div><h1>${shape.layout.title}</h1>`;
 
-    shape.elements.forEach((element) => {
-      switch (element.type) {
+    shape.fields.forEach((field) => {
+      switch (field.type) {
         case 'text':
-          html += ShapeToHTMLAdapter.renderText(element);
+          html += ShapeToHTMLAdapter.renderText(field);
           break;
         case 'email':
-          html += ShapeToHTMLAdapter.renderEmail(element);
+          html += ShapeToHTMLAdapter.renderEmail(field);
           break;
         case 'number':
-          html += ShapeToHTMLAdapter.renderNumber(element);
+          html += ShapeToHTMLAdapter.renderNumber(field);
           break;
         case 'select':
-          html += ShapeToHTMLAdapter.renderSelect(element);
+          html += ShapeToHTMLAdapter.renderSelect(field);
           break;
         case 'date':
-          html += ShapeToHTMLAdapter.renderDate(element);
+          html += ShapeToHTMLAdapter.renderDate(field);
           break;
       }
     });
@@ -28,23 +28,23 @@ export class ShapeToHTMLAdapter {
     return html;
   }
 
-  static renderText(element: FormElement): string {
-    return `<div><label for="${element.id}">${element.label}</label><input type="text" id="${element.id}" name="${element.id}" required="${element.required}" /></div>`;
+  static renderText(field: FormField): string {
+    return `<div><label for="${field.id}">${field.label}</label><input type="text" id="${field.id}" name="${field.id}" required="${field.required}" /></div>`;
   }
 
-  static renderEmail(element: FormElement): string {
-    return `<div><label for="${element.id}">${element.label}</label><input type="email" id="${element.id}" name="${element.id}" required="${element.required}" /></div>`;
+  static renderEmail(field: FormField): string {
+    return `<div><label for="${field.id}">${field.label}</label><input type="email" id="${field.id}" name="${field.id}" required="${field.required}" /></div>`;
   }
 
-  static renderNumber(element: FormElement): string {
-    return `<div><label for="${element.id}">${element.label}</label><input type="number" id="${element.id}" name="${element.id}" required="${element.required}" /></div>`;
+  static renderNumber(field: FormField): string {
+    return `<div><label for="${field.id}">${field.label}</label><input type="number" id="${field.id}" name="${field.id}" required="${field.required}" /></div>`;
   }
 
-  static renderSelect(element: FormElement): string {
-    return `<div><label for="${element.id}">${element.label}</label><select id="${element.id}" name="${element.id}" required="${element.required}">{/* Render options here */}</select></div>`;
+  static renderSelect(field: FormField): string {
+    return `<div><label for="${field.id}">${field.label}</label><select id="${field.id}" name="${field.id}" required="${field.required}">{/* Render options here */}</select></div>`;
   }
 
-  static renderDate(element: FormElement): string {
-    return `<div><label for="${element.id}">${element.label}</label><input type="date" id="${element.id}" name="${element.id}" required="${element.required}" /></div>`;
+  static renderDate(field: FormField): string {
+    return `<div><label for="${field.id}">${field.label}</label><input type="date" id="${field.id}" name="${field.id}" required="${field.required}" /></div>`;
   }
 }

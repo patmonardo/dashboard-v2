@@ -6,7 +6,6 @@ import { InvoiceView } from '@/ui/view/invoice';
 export default async function Page(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const id = params.id;
-
     const invoice = await InvoiceModel.findById(id);
     if (!invoice) {
         notFound();

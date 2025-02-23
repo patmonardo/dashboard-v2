@@ -6,10 +6,10 @@ export class ShapeToJSONAdapter {
       layout: {
         title: shape.layout.title,
       },
-      elements: shape.elements.map((element) => ({
-        id: element.id,
-        label: element.label,
-        value: data?.[element.id] || '', // Use data to populate the value
+      fields: shape.fields.map((field) => ({
+        id: field.id,
+        label: field.label,
+        value: data?.[field.id] || '', // Use data to populate the value
       })),
     };
     return JSON.stringify(json, null, 2);
