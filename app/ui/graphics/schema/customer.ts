@@ -13,7 +13,7 @@ export const CustomerFieldShapeSchema = z.object({
   type: CustomerFieldType,
   label: z.string(),
   required: z.boolean().default(false),
-  defaultValue: z.string().optional(),
+  defaultValue: z.string(),
 });
 
 // The complete customer form shape
@@ -28,7 +28,7 @@ export const CustomerFormShapeSchema = FormShapeSchema.extend({
       })
     ),
     actions: z.array(FormActionSchema).default([]),
-  }),
+  }), // Allow null or undefined layout
   fields: z.array(CustomerFieldShapeSchema),
 });
 

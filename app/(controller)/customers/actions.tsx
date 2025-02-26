@@ -12,8 +12,6 @@ export async function createCustomer(prev_state: CustomerState, formData: FormDa
     });
     if (result.status === 'error') {
     }
-    if (result.status === 'success') {
-    }
     revalidatePath('/dashboard/customers');
     redirect('/dashboard/customers');
 }

@@ -1,26 +1,22 @@
-import { notFound } from 'next/navigation';
 import Breadcrumbs from '@/(controller)/controllers/breadcrumbs';
 import { CustomerView } from '@/ui/view/customer';
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-    const params = await props.params;
-    const customer = undefined;
-    const view = new CustomerView(customer);
+export default async function Page() {
+    const view = new CustomerView();
     const form = view.render('create', 'jsx');
-
     return (
         <main>
             <Breadcrumbs
                 breadcrumbs={[
-                    { label: 'Customers', href: '/dashboard/customers' },
+                    { label: 'Customers', href: '/customers' },
                     {
-                      label: 'Create Customer',
-                      href: '/dashboard/customers/create',
-                      active: true,
-                  },
+                        label: 'Create Customer',
+                        href: '/customers/create',
+                        active: true,
+                    },
                 ]}
             />
-            ${form}
+            {form}
         </main>
     );
 }

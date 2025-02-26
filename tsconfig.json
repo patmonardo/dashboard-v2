@@ -11,6 +11,7 @@
     "checkJs": true,
     "allowImportingTsExtensions": true,
     "forceConsistentCasingInFileNames": true,
+    "jsx": "preserve",
     /* Bundled projects */
     "types": [
       "node" // Add node types for Jest
@@ -19,7 +20,6 @@
     "module": "esnext", // Change to CommonJS
     "moduleResolution": "node", // Change to node
     "esModuleInterop": true,
-    "jsx": "preserve", // Recommended for Next.js
     "plugins": [
       {
         "name": "next"
@@ -28,7 +28,9 @@
     "incremental": true,
     /* Path aliases */
     "paths": {
-      "@/*": ["./app/*"],
+      "@/*": [
+        "./app/*"
+      ]
     },
     "lib": [
       "dom",

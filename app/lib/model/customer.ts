@@ -78,10 +78,32 @@ export class CustomerModel extends BaseModel<Customer> {
     }
   }
 
-  static async findById(id: string): Promise<Customer | null> {
-    return await prisma.customer.findUnique({
-      where: { id },
-    });
+  static async findById(id: string): Promise<OperationResult<Customer>> {
+    try {
+      const customer = await prisma.customer.findUnique({
+        where: { id },
+      });
+
+      if (!customer) {
+        return {
+          data: null,
+          status: "error",
+          message: "Customer not found",
+        };
+      }
+
+      return {
+        data: customer,
+        status: "success",
+        message: "Customer found",
+      };
+    } catch (error) {
+      return {
+        data: null,
+        status: "error",
+        message: "Failed to find Customer",
+      };
+    }
   }
 
   static async count() {

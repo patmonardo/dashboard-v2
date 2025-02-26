@@ -1,0 +1,82 @@
+pipeline {
+    agent none  // Allow multiple agents
+
+    triggers {
+        cron('H/30 * * * *')
+    }
+
+    stages {
+        stage('Logos Sync') {
+            agent {
+                node {
+                    label 'logos-agent'
+                    customWorkspace '/home/jenkins-agent/logos-agent/workspace/git-sync'
+                }
+            }
+            steps {
+                sh """
+                echo "=== Git Sync on ${agentName} at \$(date '+%Y-%m-%d %H:%M:%S') ==="
+
+                # Setup remote
+                git remote remove origin || true
+                git remote add origin ssh://pat@buddhi/home/pat/VSCode/sankara-project
+
+                # Sync
+                git fetch origin
+                git reset --hard origin/main
+                git branch --set-upstream-to=origin/main main || true
+
+                # Report
+                echo "\\nStatus on ${agentName}:"
+                git status --short --branch
+                git --no-pager log -1 --pretty=format:"%h - %s (%cr)"
+                """
+            }
+        }
+        stage('Mahat Sync') {
+            agent {
+                node {
+                    label 'mahat-agent'
+                    customWorkspace '/home/jenkins-agent/mahat-agent/workspace/git-sync'
+                }
+            }
+            steps {
+                sh """
+                echo "=== Git Sync on ${agentName} at \$(date '+%Y-%m-%d %H:%M:%S') ==="
+
+                git remote remove origin || true
+                git remote add origin ssh://pat@logos/home/pat/VSCode/sankara-project
+
+                git fetch origin
+                git reset --hard origin/main
+                git branch --set-upstream-to=origin/main main || true
+
+                echo "\\nStatus on ${agentName}:"
+                git status --short --branch
+                git --no-pager log -1 --pretty=format:"%h - %s (%cr)"
+                """
+            }
+        }
+    }
+}
+
+// Define the git sync steps
+def gitSync(String agentName) {
+    sh """
+        echo "=== Git Sync on ${agentName} at \$(date '+%Y-%m-%d %H:%M:%S') ==="
+
+        # Setup remote
+        git remote remove origin || true
+        git remote add origin ssh://pat@logos/home/pat/VSCode/sankara-project
+
+        # Sync
+        git fetch origin
+        git reset --hard origin/main
+        git branch --set-upstream-to=origin/main main || true
+
+        # Report
+        echo "\\nStatus on ${agentName}:"
+        git status --short --branch
+        git --no-pager log -1 --pretty=format:"%h - %s (%cr)"
+    """
+}

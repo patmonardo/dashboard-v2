@@ -1,25 +1,23 @@
-import React from 'react';
-import { FormMatter, FormField,  FormShape } from '@/ui/graphics/schema/form';
+import React from "react";
+import { FormMatter, FormField, FormShape } from "@/ui/graphics/schema/form";
 
 export class ShapeToJSXAdapter {
   static toJSX(shape: FormShape, data: FormMatter): React.ReactNode {
-    console.log('toJSX', shape, data);
     return (
       <div>
         <h1>{shape.layout.title}</h1>
         {shape.fields.map((field) => {
-          console.log('field', field);
           switch (field.type) {
-            case 'text':
+            case "text":
               return ShapeToJSXAdapter.renderText(field, data);
-            case 'email':
+            case "email":
               return ShapeToJSXAdapter.renderEmail(field, data);
-            case 'number':
+            case "number":
               return ShapeToJSXAdapter.renderNumber(field, data);
-            case 'select':
-              return ShapeToJSXAdapter.renderSelect(field, data);
-            case 'date':
+            case "date":
               return ShapeToJSXAdapter.renderDate(field, data);
+            case "select":
+              return ShapeToJSXAdapter.renderSelect(field, data);
             default:
               return null;
           }
@@ -28,7 +26,7 @@ export class ShapeToJSXAdapter {
     );
   }
 
-  static renderText(field: FormField, data: FormMatter): React.ReactNode {
+  static renderText(field: FormField, data: FormMatter): React.ReactElement {
     return (
       <div>
         <label htmlFor={field.id}>{field.label}</label>
@@ -43,7 +41,7 @@ export class ShapeToJSXAdapter {
     );
   }
 
-  static renderEmail(field: FormField, data: FormMatter): React.ReactNode {
+  static renderEmail(field: FormField, data: FormMatter): React.ReactElement {
     return (
       <div>
         <label htmlFor={field.id}>{field.label}</label>
@@ -52,13 +50,13 @@ export class ShapeToJSXAdapter {
           id={field.id}
           name={field.id}
           required={field.required}
-          defaultValue={data?.[field.id]} // Prepopulate with data.id
+          defaultValue={data?.[field.id] || field.defaultValue}
         />
       </div>
     );
   }
 
-  static renderNumber(field: FormField, data: FormMatter): React.ReactNode {
+  static renderNumber(field: FormField, data: FormMatter): React.ReactElement {
     return (
       <div>
         <label htmlFor={field.id}>{field.label}</label>
@@ -73,18 +71,7 @@ export class ShapeToJSXAdapter {
     );
   }
 
-  static renderSelect(field: FormField, data: FormMatter): React.ReactNode {
-    return (
-      <div>
-        <label htmlFor={field.id}>{field.label}</label>
-        <select id={field.id} name={field.id} required={field.required}  defaultValue={data?.[field.id]}>
-          {/* Render options here */}
-        </select>
-      </div>
-    );
-  }
-
-  static renderDate(field: FormField, data: FormMatter): React.ReactNode {
+  static renderDate(field: FormField, data: FormMatter): React.ReactElement {
     return (
       <div>
         <label htmlFor={field.id}>{field.label}</label>
@@ -95,6 +82,30 @@ export class ShapeToJSXAdapter {
           required={field.required}
           defaultValue={data?.[field.id]} // Prepopulate with data.id
         />
+      </div>
+    );
+  }
+  static renderSelect(field: FormField, data: FormMatter): React.ReactElement {
+    const selectedValue = data?.[field.id] || field.defaultValue;
+    return (
+      <div>
+        <label htmlFor={field.id}>{field.label}</label>
+        <select
+          id={field.id}
+          name={field.id}
+          required={field.required}
+          defaultValue={selectedValue}
+        >
+          {field.options?.map((option) => (
+            <option
+              key={option.value}
+              value={option.value}
+              selected={option.value === selectedValue}
+            >
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
     );
   }

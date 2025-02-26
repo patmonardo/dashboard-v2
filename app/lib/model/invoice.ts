@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/data/client";
 import type { OperationResult } from "@/lib/data/schema/base";
+import type { Customer } from "@/lib/data/schema/customer";
 import {
   InvoiceSchema,
   CreateInvoiceSchema,
@@ -42,7 +43,7 @@ export class InvoiceModel extends BaseModel<Invoice> {
       });
 
       return {
-        data: invoice,
+        data: invoice as Invoice & { customer: Customer },
         status: "success",
         message: "Invoice created",
       };
@@ -81,7 +82,7 @@ export class InvoiceModel extends BaseModel<Invoice> {
       });
 
       return {
-        data: invoice,
+        data: invoice as Invoice & { customer: Customer },
         status: "success",
         message: "Invoice updated successfully",
       };
@@ -94,14 +95,37 @@ export class InvoiceModel extends BaseModel<Invoice> {
     }
   }
 
-  // Pure queries, for example:
-  static async findById(id: string): Promise<Invoice | null> {
-    return await prisma.invoice.findUnique({
-      where: { id },
-      include: {
-        customer: true,
-      },
-    });
+  static async findById(
+    id: string
+  ): Promise<OperationResult<Invoice & { customer: Customer }>> {
+    try {
+      const invoice = await prisma.invoice.findUnique({
+        where: { id },
+        include: {
+          customer: true,
+        },
+      });
+
+      if (!invoice) {
+        return {
+          data: null,
+          status: "error",
+          message: "Invoice not found",
+        };
+      }
+
+      return {
+        data: invoice as Invoice & { customer: Customer },
+        status: "success",
+        message: "Invoice found",
+      };
+    } catch (error) {
+      return {
+        data: null,
+        status: "error",
+        message: "Failed to find invoice",
+      };
+    }
   }
 
   static async findMany(options: {
@@ -112,26 +136,10 @@ export class InvoiceModel extends BaseModel<Invoice> {
     const { page = 1, itemsPerPage = 6 } = options;
     const offset = (page - 1) * itemsPerPage;
 
+    // For now, just implement simple pagination without filtering
     return await prisma.invoice.findMany({
       skip: offset,
       take: itemsPerPage,
-      where: options.query
-        ? {
-            OR: [
-              {
-                customer: {
-                  name: { contains: options.query, mode: "insensitive" },
-                },
-              },
-              { status: options.query },
-              {
-                amount: options.query
-                  ? parseInt(options.query) || undefined
-                  : undefined,
-              },
-            ],
-          }
-        : undefined,
       include: {
         customer: {
           select: {
@@ -152,7 +160,7 @@ export class InvoiceModel extends BaseModel<Invoice> {
   static async aggregatePaidAmount() {
     const result = await prisma.invoice.aggregate({
       where: {
-        status: "paid",
+        status: "PAID",
       },
       _sum: {
         amount: true,

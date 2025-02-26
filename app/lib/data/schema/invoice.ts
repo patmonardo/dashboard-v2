@@ -1,12 +1,11 @@
 import { z } from 'zod'
-import { Decimal } from '@prisma/client/runtime/library'
 import { BaseSchema, BaseStateSchema } from './base'
 
 // Base Invoice Schema
 export const InvoiceSchema = BaseSchema.extend({
   customerId: z.string().uuid(),
-  amount: z.number(),
-  status: z.string(),
+  amount: z.number().int().positive(), // Ensure amount is positive
+  status: z.enum(['PENDING', 'PAID', 'OVERDUE', 'DRAFT']), // Restore the enum
   date: z.date().optional()
 })
 

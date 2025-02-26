@@ -3,7 +3,7 @@ import { Decimal } from '@prisma/client/runtime/library'
 
 // Base Schema (all entities have these properties)
 export const BaseSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
   createdAt: z.date(),
   updatedAt: z.date(),
 })
@@ -34,7 +34,7 @@ export type OperationResult<T> = z.infer<ReturnType<typeof OperationResultSchema
 
 // Base monetary value
 export const MonetarySchema = z.object({
-  amount: z.instanceof(Decimal),
+  amount: z.number(),
   currency: z.string().default('USD')
 })
 

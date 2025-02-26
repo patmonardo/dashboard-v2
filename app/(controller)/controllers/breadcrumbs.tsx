@@ -1,7 +1,6 @@
 import { clsx } from 'clsx';
 import Link from 'next/link';
 import { lusitana } from '@/ui/graphics/fonts/lusitana';
-import { Dropdown } from 'react-bootstrap';
 
 interface Breadcrumb {
   label: string;
@@ -25,16 +24,11 @@ export default function Breadcrumbs({
               breadcrumb.active ? 'text-gray-900' : 'text-gray-500',
             )}
           >
-            <Dropdown>
-              <Dropdown.Toggle as={Link} href={breadcrumb.href}>
-                {breadcrumb.label}
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item href={`${breadcrumb.href}/details`}>View Details</Dropdown.Item>
-                <Dropdown.Item href={`${breadcrumb.href}/edit`}>Edit</Dropdown.Item>
-                <Dropdown.Item href={`${breadcrumb.href}/delete`}>Delete</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+            {/* Replace the dropdown with a simple link for now */}
+            <Link href={breadcrumb.href}>
+              {breadcrumb.label}
+            </Link>
+
             {index < breadcrumbs.length - 1 ? (
               <span className="mx-3 inline-block">/</span>
             ) : null}

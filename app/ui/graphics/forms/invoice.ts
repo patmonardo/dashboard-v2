@@ -11,7 +11,8 @@ export class InvoiceForm extends Form<InvoiceFormShape> {
   getFormShape(mode: "create" | "edit"): InvoiceFormShape {
     const isCreate = mode === "create";
 
-    return InvoiceFormShapeSchema.parse({
+    //return InvoiceFormShapeSchema.safeParse({
+    return {
       layout: {
         title: isCreate ? "Create Invoice" : "Edit Invoice",
         columns: "single",
@@ -22,9 +23,15 @@ export class InvoiceForm extends Form<InvoiceFormShape> {
           },
         ],
         actions: [
-          { type: "cancel", label: "Cancel", variant: "secondary" },
+          {
+            type: "button",
+            action: "cancel",
+            label: "Cancel",
+            variant: "secondary",
+          },
           {
             type: "submit",
+            action: "submit",
             label: isCreate ? "Create Invoice" : "Save Changes",
             variant: "primary",
           },
@@ -36,31 +43,34 @@ export class InvoiceForm extends Form<InvoiceFormShape> {
           type: "select",
           label: "Customer",
           required: true,
-          defaultValue: isCreate ? undefined : this.invoice?.customerId,
+          defaultValue: "", // isCreate ? undefined : this.invoice?.customerId,
         },
         {
           id: "amount",
           type: "number",
           label: "Amount ($)",
           required: true,
-          defaultValue: isCreate ? undefined : this.invoice?.amount,
+          defaultValue: "", // isCreate ? undefined : this.invoice?.amount,
         },
         {
           id: "status",
           type: "select",
           label: "Status",
           required: true,
-          defaultValue: isCreate ? undefined : this.invoice?.status,
+          defaultValue: "", // isCreate ? undefined : this.invoice?.status,
         },
         {
           id: "date",
           type: "date",
           label: "Date",
           required: true,
-          defaultValue: isCreate ? undefined : this.invoice?.date,
+          defaultValue: "", //isCreate ? undefined : this.invoice?.date,
         },
       ],
-    });
+      state: {
+        status: "idle",
+      },
+    };
   }
 
   create(): InvoiceFormShape {

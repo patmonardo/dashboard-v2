@@ -2,9 +2,9 @@ import React from "react";
 import type {
   FormMatter,
   FormMode,
+  FormContent,
   FormState,
   FormShape,
-  FormContent,
 } from "@/ui/graphics/schema/form";
 import { FormShapeAdapter } from "@/ui/graphics/adapters";
 
@@ -24,15 +24,14 @@ export abstract class Form<T extends FormShape> {
     let shape: T;
     switch (mode) {
       case "create":
-        shape = this.getFormShape("create");
+        shape = this.create();
         break;
       case "edit":
-        shape = this.getFormShape("edit");
+        shape = this.edit();
         break;
       default:
         throw new Error(`Unsupported mode: ${mode}`);
     }
-    console.log("render", mode, format);
     switch (format) {
       case "jsx":
         return this.renderJSX(shape, this.data);

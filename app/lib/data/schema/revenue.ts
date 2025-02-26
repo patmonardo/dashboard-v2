@@ -2,10 +2,10 @@ import { z } from 'zod'
 import { BaseSchema, BaseStateSchema } from './base'
 
 export const RevenueSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
   month: z.date(),
   revenue: z.number(), // Use z.number() instead of Decimal
-  expenses: z.number() // Use z.number() instead of Decimal
+  expenses: z.number().optional() // Use z.number() instead of Decimal
 })
 
 // State Schema - Runtime state and validation errors

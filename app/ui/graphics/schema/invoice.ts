@@ -14,7 +14,7 @@ export const InvoiceFieldShapeSchema = z.object({
   type: InvoiceFieldType,
   label: z.string(),
   required: z.boolean().default(false),
-  defaultValue: z.string().optional(),
+  defaultValue: z.string(),
 });
 
 // Extend the base layout so that actions remain available,

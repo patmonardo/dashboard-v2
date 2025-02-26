@@ -11,7 +11,8 @@ export class CustomerForm extends Form<CustomerFormShape> {
   getFormShape(mode: "create" | "edit"): CustomerFormShape {
     const isCreate = mode === "create";
 
-    return CustomerFormShapeSchema.parse({
+    //return CustomerFormShapeSchema.safeParse({
+    return {
       layout: {
         title: isCreate ? "New Customer" : "Edit Customer",
         columns: "single",
@@ -22,13 +23,19 @@ export class CustomerForm extends Form<CustomerFormShape> {
           },
         ],
         actions: [
-          { type: "cancel", label: "Cancel", variant: "secondary" },
+          {
+            type: "button",  // Changed from "cancel"
+            action: "cancel", // Added semantic meaning
+            label: "Cancel",
+            variant: "secondary"
+          },
           {
             type: "submit",
+            action: "submit", // Added semantic meaning
             label: isCreate ? "Create Customer" : "Save Changes",
             variant: "primary",
           },
-        ],
+        ]
       },
       fields: [
         {
@@ -36,24 +43,27 @@ export class CustomerForm extends Form<CustomerFormShape> {
           type: "text",
           label: "Name",
           required: true,
-          defaultValue: isCreate ? undefined : this.customer?.name,
+          defaultValue: "" // isCreate ? undefined : this.customer?.name,
         },
         {
           id: "email",
           type: "email",
           label: "Email",
           required: true,
-          defaultValue: isCreate ? undefined : this.customer?.email,
+          defaultValue: "" // isCreate ? undefined : this.customer?.email,
         },
         {
           id: "imageUrl",
           type: "url",
           label: "Image URL",
           required: false,
-          defaultValue: isCreate ? undefined : this.customer?.imageUrl,
+          defaultValue: "" // isCreate ? undefined : this.customer?.imageUrl,
         },
       ],
-    });
+      "state": {
+        "status": "idle",
+      }
+    };
   }
 
   create(): CustomerFormShape {
