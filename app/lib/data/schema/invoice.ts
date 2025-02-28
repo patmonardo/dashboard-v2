@@ -5,7 +5,7 @@ import { BaseSchema, BaseStateSchema } from './base'
 export const InvoiceSchema = BaseSchema.extend({
   customerId: z.string().uuid(),
   amount: z.number().int().positive(), // Ensure amount is positive
-  status: z.enum(['PENDING', 'PAID', 'OVERDUE', 'DRAFT']), // Restore the enum
+  status: z.enum(['PENDING', 'PAID', 'OVERDUE', 'DRAFT'] as const), // Restore the enum
   date: z.date().optional()
 })
 
@@ -28,10 +28,6 @@ export const CreateInvoiceSchema = InvoiceSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-}).extend({
-  amount: z.number().positive({
-    message: 'Amount must be greater than 0'
-  })
 })
 
 export const UpdateInvoiceSchema = InvoiceSchema.omit({

@@ -2,25 +2,36 @@ import { prisma } from "@/lib/data/client";
 import type { OperationResult } from "@/lib/data/schema/base";
 import type { Customer } from "@/lib/data/schema/customer";
 import {
-  InvoiceSchema,
+  InvoiceShapeSchema,
   CreateInvoiceSchema,
   UpdateInvoiceSchema,
 } from "@/lib/data/schema/invoice";
 import type {
   Invoice,
+  InvoiceShape,
   CreateInvoice,
   UpdateInvoice,
 } from "@/lib/data/schema/invoice";
 import { BaseModel } from "./base";
 
-export class InvoiceModel extends BaseModel<Invoice> {
-  constructor() {
-    super(InvoiceSchema, {} as Invoice);
+export class InvoiceModel extends BaseModel<InvoiceShape> {
+  constructor(invoice?: Invoice) {
+    const shape: InvoiceShape = {
+      base: invoice || ({} as Invoice),
+      state: {
+        status: "active",
+        validation: {},
+        message: undefined,
+      },
+    };
+
+    super(InvoiceShapeSchema, shape);
   }
+
   static async create(data: CreateInvoice): Promise<OperationResult<Invoice>> {
     try {
-      const validated = CreateInvoiceSchema.parse(data);
-      if (!validated) {
+      const validated = CreateInvoiceSchema.safeParse(data);
+      if (!validated.success) {
         return {
           data: null,
           status: "error",
@@ -30,9 +41,7 @@ export class InvoiceModel extends BaseModel<Invoice> {
       const invoice = await prisma.invoice.create({
         data: {
           id: crypto.randomUUID(),
-          customerId: data.customerId,
-          amount: data.amount,
-          status: data.status,
+          ...validated.data,
           date: data.date ?? new Date(), // Use provided date or current date
           createdAt: new Date(), // Always set to current time
           updatedAt: new Date(), // Always set to current time
@@ -62,8 +71,8 @@ export class InvoiceModel extends BaseModel<Invoice> {
     data: UpdateInvoice
   ): Promise<OperationResult<Invoice>> {
     try {
-      const validated = UpdateInvoiceSchema.parse(data);
-      if (!validated) {
+      const validated = UpdateInvoiceSchema.safeParse(data);
+      if (!validated.success) {
         return {
           data: null,
           status: "error",
@@ -73,7 +82,7 @@ export class InvoiceModel extends BaseModel<Invoice> {
       const invoice = await prisma.invoice.update({
         where: { id },
         data: {
-          ...data,
+          ...validated.data,
           updatedAt: new Date(),
         },
         include: {
@@ -127,30 +136,43 @@ export class InvoiceModel extends BaseModel<Invoice> {
       };
     }
   }
-
-  static async findMany(options: {
-    page?: number;
+  static async findAll(options: {
     query?: string;
-    itemsPerPage?: number;
-  }) {
-    const { page = 1, itemsPerPage = 6 } = options;
-    const offset = (page - 1) * itemsPerPage;
+    page?: number;
+    pageSize?: number;
+  }): Promise<OperationResult<(Invoice & { customer: Pick<Customer, 'name' | 'email' | 'imageUrl'> })[]>> {
+    try {
+      const { page = 1, pageSize = 10, query = '' } = options;
+      const offset = (page - 1) * pageSize;
 
-    // For now, just implement simple pagination without filtering
-    return await prisma.invoice.findMany({
-      skip: offset,
-      take: itemsPerPage,
-      include: {
-        customer: {
-          select: {
-            name: true,
-            email: true,
-            imageUrl: true,
+      const invoices = await prisma.invoice.findMany({
+        skip: offset,
+        take: pageSize,
+        include: {
+          customer: {
+            select: {
+              name: true,
+              email: true,
+              imageUrl: true,
+            },
           },
         },
-      },
-      orderBy: { date: "desc" },
-    });
+        orderBy: { date: "desc" },
+      });
+
+      return {
+        status: "success",
+        data: invoices,
+        message: "Invoices retrieved successfully", // Fixed: was "Customers"
+      };
+    } catch (error) {
+      console.error("Error fetching invoices:", error); // Fixed: was "customers"
+      return {
+        status: "error",
+        data: null,
+        message: "Failed to retrieve invoices", // Fixed: was "customers"
+      };
+    }
   }
 
   static async count() {

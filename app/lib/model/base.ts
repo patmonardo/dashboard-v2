@@ -1,42 +1,55 @@
 import { z } from 'zod'
 import type { Base, BaseState, BaseShape } from '../data/schema/base'
 
-export abstract class BaseModel<T extends Base> {
-  // Core data and validation
+export abstract class BaseModel<T extends BaseShape> {
   constructor(
     protected readonly schema: z.ZodType<T>,
-    protected readonly value: T
-  ) { }
+    protected readonly shape: T
+  ) {}
 
-  // Pure validation
-  validate(): boolean {
-    try {
-      this.schema.parse(this.value)
-      return true
-    } catch {
-      return false
+  // TypeScript property accessors
+  get state(): BaseState {
+    return this.shape.state;
+  }
+
+  get value(): Base {
+    return this.shape.base;
+  }
+
+  get fullShape(): BaseShape {
+    return this.shape;
+  }
+
+  // Simplified validation - returns new shape with basic validation status
+  validate(): T {
+    const result = this.schema.safeParse(this.shape);
+
+    if (!result.success) {
+      // Return new shape with simple validation status
+      return {
+        ...this.shape,
+        state: {
+          ...this.shape.state,
+          // No complex error formatting for now
+          validation: { _form: ["Validation failed"] },
+          message: "Validation failed"
+        }
+      };
     }
-  }
 
-  // Pure transformation - returns new data
-  map<U extends Base>(fn: (value: T) => U): U {
-    return fn(this.value)
-  }
-
-  // Get current state
-  getState(): BaseState {
+    // Return shape with cleared validation
     return {
-      status: 'active',
-      validation: {},
-      message: undefined
-    }
+      ...this.shape,
+      state: {
+        ...this.shape.state,
+        validation: {},
+        message: undefined
+      }
+    };
   }
 
-  // Get complete shape
-  getShape(): BaseShape {
-    return {
-      base: this.value,
-      state: this.getState()
-    }
+  // Transform to new shape
+  map<U extends BaseShape>(fn: (shape: T) => U): U {
+    return fn(this.shape);
   }
 }

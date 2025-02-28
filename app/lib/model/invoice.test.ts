@@ -150,6 +150,7 @@ describe('InvoiceModel (Database)', () => {
             }
         }
     });
+
     it('should delete an invoice', async () => {
       // Create a customer
       const createCustomerData: CreateCustomer = {

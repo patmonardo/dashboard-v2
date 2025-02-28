@@ -4,7 +4,7 @@ import { BaseSchema, BaseStateSchema } from './base'
 export const CustomerSchema = BaseSchema.extend({
   name: z.string(),
   email: z.string().email(),
-  imageUrl: z.string().nullable().optional(),
+  imageUrl: z.string().url().nullish().or(z.literal("")),
 })
 
 // State Schema - Runtime state and validation errors

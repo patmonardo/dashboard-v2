@@ -23,16 +23,23 @@ export class RevenueModel {
 
   static async create(data: CreateRevenue): Promise<OperationResult<Revenue>> {
     try {
-      const validated = CreateRevenueSchema.parse({
+      const validated = CreateRevenueSchema.safeParse({
         ...data,
         expenses: data.expenses || 0  // Ensure expenses has a default value
       })
 
+      if (!validated.success) {
+        return {
+          data: null,
+          status: 'error',
+          message: 'Missing Fields. Failed to Create Revenue.',
+        }
+      }
       const revenue = await prisma.revenue.create({
         data: {
-          month: validated.month,
-          revenue: validated.revenue,
-          expenses: validated.expenses
+          month: validated.data?.month,
+          revenue: validated.data?.revenue,
+          expenses: validated.data?.expenses
         }
       })
       return {

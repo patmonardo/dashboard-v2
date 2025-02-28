@@ -1,3 +1,4 @@
+import type { OperationResult } from "@/lib/data/schema/base";
 import { ImageShapeSchema, type ImageShape } from '@/ui/graphics/schema/image';
 import { Image } from './image';
 
@@ -6,8 +7,8 @@ export class AvatarImage extends Image<ImageShape> {
     super(config);
   }
 
-  protected create(): ImageShape {
-    return ImageShapeSchema.parse({
+  protected create(): OperationResult<ImageShape> {
+    const shape = ImageShapeSchema.parse({
       src: this.config.src || '/placeholder-avatar.png',
       alt: this.config.alt || 'User avatar',
       size: {
@@ -20,13 +21,18 @@ export class AvatarImage extends Image<ImageShape> {
       loading: 'eager', // Avatars should load immediately
       quality: 90      // Higher quality for small images
     });
+    return {
+      data: shape,
+      status: "success",
+      message: "Form created successfully",
+    };
   }
 
-  protected edit(): ImageShape {
+  protected edit(): OperationResult<ImageShape> {
     return this.create();
   }
 
-  render(): ImageShape {
-    return this.create();
+  render(): OperationResult<ImageShape> {
+    return this.render();
   }
 }

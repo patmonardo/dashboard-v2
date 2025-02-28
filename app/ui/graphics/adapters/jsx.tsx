@@ -1,11 +1,26 @@
 import React from "react";
-import { FormMatter, FormField, FormShape } from "@/ui/graphics/schema/form";
+import { z } from "zod";
+
+import type {
+  FormMatter,
+  FormHandler,
+  FormField,
+  FormAction,
+  FormShape,
+} from "@/ui/graphics/schema/form";
 
 export class ShapeToJSXAdapter {
-  static toJSX(shape: FormShape, data: FormMatter): React.ReactNode {
+  static toJSX(
+    shape: FormShape,
+    data: FormMatter,
+    handler: FormHandler
+  ): React.ReactNode {
+    // Get the main form action from options
+    const formAction = handler.submit as any;
+    console.log(formAction)
     return (
-      <div>
-        <h1>{shape.layout.title}</h1>
+      <form action={formAction}>
+        {/* Render fields */}
         {shape.fields.map((field) => {
           switch (field.type) {
             case "text":
@@ -22,7 +37,14 @@ export class ShapeToJSXAdapter {
               return null;
           }
         })}
-      </div>
+
+        {/* Render actions */}
+        <div className="form-actions">
+          {shape.layout.actions.map((action) =>
+            ShapeToJSXAdapter.renderButton(action, handler)
+          )}
+        </div>
+      </form>
     );
   }
 
@@ -85,6 +107,7 @@ export class ShapeToJSXAdapter {
       </div>
     );
   }
+
   static renderSelect(field: FormField, data: FormMatter): React.ReactElement {
     const selectedValue = data?.[field.id] || field.defaultValue;
     return (
@@ -108,5 +131,49 @@ export class ShapeToJSXAdapter {
         </select>
       </div>
     );
+  }
+
+  static renderButton(
+    action: FormAction,
+    handler: FormHandler
+  ): React.ReactElement {
+    // Common button attributes
+    const buttonProps = {
+      className: `btn btn-${action.variant || "primary"}`,
+    };
+
+    if (action.type === "submit") {
+      return (
+        <button {...buttonProps} type="submit">
+          {action.label}
+        </button>
+      );
+    }
+
+    if (action.type === "reset") {
+      return (
+        <button {...buttonProps} type="reset">
+          {action.label}
+        </button>
+      );
+    }
+    // Regular button
+    // For cancel buttons (or other custom buttons)
+    if (action.id === "cancel" && handler.cancel) {
+      console.log("handler.cancel: ", handler.cancel);
+
+      return (
+        <button
+          {...buttonProps}
+          type="button"
+          formAction={handler.cancel as any}
+        >
+          {action.label}
+        </button>
+      );
+    }
+
+    // Fallback (should never happen with TypeScript)
+   return <></>;
   }
 }

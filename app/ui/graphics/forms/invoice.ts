@@ -1,18 +1,21 @@
-import type { Invoice } from "@/lib/data/schema/invoice";
 import { Form } from "./form";
+import type { Invoice } from "@/lib/data/schema/invoice";
 import { InvoiceFormShapeSchema } from "@/ui/graphics/schema/invoice";
 import type { InvoiceFormShape } from "@/ui/graphics/schema/invoice";
+import type { OperationResult } from "@/lib/data/schema/base";
 
 export class InvoiceForm extends Form<InvoiceFormShape> {
   constructor(private readonly invoice?: Invoice) {
     super(invoice);
   }
 
-  getFormShape(mode: "create" | "edit"): InvoiceFormShape {
+  private getFormShape(mode: "create" | "edit"): InvoiceFormShape {
     const isCreate = mode === "create";
-
-    //return InvoiceFormShapeSchema.safeParse({
-    return {
+    // Format date properly if it exists
+    const formattedDate = this.invoice?.date
+      ? new Date(this.invoice.date).toISOString().split("T")[0]
+      : "";
+    return InvoiceFormShapeSchema.parse({
       layout: {
         title: isCreate ? "Create Invoice" : "Edit Invoice",
         columns: "single",
@@ -43,41 +46,67 @@ export class InvoiceForm extends Form<InvoiceFormShape> {
           type: "select",
           label: "Customer",
           required: true,
-          defaultValue: "", // isCreate ? undefined : this.invoice?.customerId,
+          defaultValue: isCreate ? "" : this.invoice?.customerId || "",
         },
         {
           id: "amount",
           type: "number",
           label: "Amount ($)",
           required: true,
-          defaultValue: "", // isCreate ? undefined : this.invoice?.amount,
+          defaultValue: isCreate ? "" : this.invoice?.amount?.toString() || "",
         },
         {
           id: "status",
           type: "select",
           label: "Status",
           required: true,
-          defaultValue: "", // isCreate ? undefined : this.invoice?.status,
+          defaultValue: isCreate ? "" : this.invoice?.status || "",
         },
         {
           id: "date",
           type: "date",
           label: "Date",
           required: true,
-          defaultValue: "", //isCreate ? undefined : this.invoice?.date,
+          defaultValue: isCreate ? "" : formattedDate,
         },
       ],
       state: {
         status: "idle",
       },
-    };
+    });
   }
 
-  create(): InvoiceFormShape {
-    return this.getFormShape("create");
+  create(): OperationResult<InvoiceFormShape> {
+    try {
+      const shape = this.getFormShape("create");
+      return {
+        data: shape,
+        status: "success",
+        message: "Form created successfully",
+      };
+    } catch {
+      return {
+        data: null,
+        status: "error",
+        message: "Invalid form configuration",
+      };
+    }
   }
 
-  edit(): InvoiceFormShape {
-    return this.getFormShape("edit");
+  edit(): OperationResult<InvoiceFormShape> {
+    try {
+      const shape = this.getFormShape("edit");
+      return {
+        data: shape,
+        status: "success",
+        message: "Invoice created successfully",
+      };
+    } catch {
+      return {
+        data: null,
+        status: "error",
+        message: "Invalid invoice configuration",
+      };
+    }
   }
 }

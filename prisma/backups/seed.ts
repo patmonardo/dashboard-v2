@@ -3,6 +3,7 @@ import { CustomerModel, InvoiceModel, RevenueModel } from '@/lib/model'; // Adju
 import { PrismaClient, InvoiceStatus } from '@prisma/client'; // Import PrismaClient
 import { CreateInvoice } from '@/lib/data/schema/invoice'; // Import CreateInvoice type
 
+/*
 const prisma = new PrismaClient(); // Instantiate PrismaClient
 
 import  { users, customers, invoices, revenue } from './placeholder-data.ts';
@@ -101,3 +102,6 @@ beforeAll(async () => {
     expect(insertedRevenue.length).toBe(revenue.length);
   });
 });
+
+
+*/

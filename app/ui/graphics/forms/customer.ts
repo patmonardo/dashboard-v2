@@ -1,18 +1,18 @@
 import { Form } from "./form";
-import { CustomerFormShapeSchema } from "@/ui/graphics/schema/customer";
-import type { CustomerFormShape } from "@/ui/graphics/schema/customer";
+import type { OperationResult } from "@/lib/data/schema/base";
 import type { Customer } from "@/lib/data/schema/customer";
+import type { CustomerFormShape } from "@/ui/graphics/schema/customer";
+import { CustomerFormShapeSchema } from "@/ui/graphics/schema/customer";
 
 export class CustomerForm extends Form<CustomerFormShape> {
   constructor(private readonly customer?: Customer) {
     super(customer);
   }
 
-  getFormShape(mode: "create" | "edit"): CustomerFormShape {
+  private getFormShape(mode: "create" | "edit"): CustomerFormShape {
     const isCreate = mode === "create";
 
-    //return CustomerFormShapeSchema.safeParse({
-    return {
+    return CustomerFormShapeSchema.parse({
       layout: {
         title: isCreate ? "New Customer" : "Edit Customer",
         columns: "single",
@@ -24,18 +24,19 @@ export class CustomerForm extends Form<CustomerFormShape> {
         ],
         actions: [
           {
-            type: "button",  // Changed from "cancel"
-            action: "cancel", // Added semantic meaning
-            label: "Cancel",
-            variant: "secondary"
-          },
-          {
+            id: "submit",
             type: "submit",
-            action: "submit", // Added semantic meaning
+            action: "submit",
             label: isCreate ? "Create Customer" : "Save Changes",
             variant: "primary",
           },
-        ]
+          {
+            id: "cancel",
+            type: "button",
+            label: "Cancel",
+            variant: "secondary",
+          },
+        ],
       },
       fields: [
         {
@@ -43,34 +44,60 @@ export class CustomerForm extends Form<CustomerFormShape> {
           type: "text",
           label: "Name",
           required: true,
-          defaultValue: "" // isCreate ? undefined : this.customer?.name,
+          defaultValue: isCreate ? "" : (this.customer?.name || ""),
         },
         {
           id: "email",
           type: "email",
           label: "Email",
           required: true,
-          defaultValue: "" // isCreate ? undefined : this.customer?.email,
+          defaultValue: isCreate ? "" : (this.customer?.email || ""),
         },
         {
           id: "imageUrl",
           type: "url",
           label: "Image URL",
           required: false,
-          defaultValue: "" // isCreate ? undefined : this.customer?.imageUrl,
+          defaultValue: isCreate ? "" : (this.customer?.imageUrl || ""),
         },
       ],
-      "state": {
-        "status": "idle",
-      }
-    };
+      state: {
+        status: "idle",
+      },
+    });
   }
 
-  create(): CustomerFormShape {
-    return this.getFormShape("create");
+  create(): OperationResult<CustomerFormShape> {
+    try {
+      const shape = this.getFormShape("create");
+      return {
+        data: shape,
+        status: "success",
+        message: "Form created successfully",
+      };
+    } catch {
+      return {
+        data: null,
+        status: "error",
+        message: "Invalid form configuration",
+      };
+    }
   }
 
-  edit(): CustomerFormShape {
-    return this.getFormShape("edit");
+  edit(): OperationResult<CustomerFormShape> {
+    try {
+      const shape = this.getFormShape("edit");
+      return {
+        data: shape,
+        status: "success",
+        message: "Form updated successfully", // Fixed message
+      };
+    } catch {
+      return {
+        data: null,
+        status: "error",
+        message: "Invalid form configuration", // Fixed message
+      };
+    }
   }
 }

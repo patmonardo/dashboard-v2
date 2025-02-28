@@ -26,10 +26,10 @@ export const CustomerFormShapeSchema = FormShapeSchema.extend({
         title: z.string(),
         fieldIds: z.array(CustomerFieldId),
       })
-    ),
+    ).default([]),
     actions: z.array(FormActionSchema).default([]),
   }), // Allow null or undefined layout
-  fields: z.array(CustomerFieldShapeSchema),
+  fields: z.array(CustomerFieldShapeSchema).default([]),
 });
 
 export type CustomerFieldShape = z.infer<typeof CustomerFieldShapeSchema>;

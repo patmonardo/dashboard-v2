@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { Decimal } from '@prisma/client/runtime/library'
+import { error } from 'console'
 
 // Base Schema (all entities have these properties)
 export const BaseSchema = z.object({
@@ -21,16 +22,46 @@ export const BaseShapeSchema = z.object({
   state: BaseStateSchema
 })
 
-// Simple operation result type
-export function OperationResultSchema<T>() {
-  return z.object({
-    data: z.nullable(z.any() as z.ZodType<T>),
-    status: z.enum(['success', 'error']),
-    message: z.string(),
-  });
-}
+export type OperationResult<T> =
+  | { data: T; status: "success"; message: string; }
+  | { data: null; status: "error"; message: string; errors?: Record<string, string[]>; };
 
-export type OperationResult<T> = z.infer<ReturnType<typeof OperationResultSchema<T>>>;
+export function flattenZodErrors(
+  formatted: z.ZodFormattedError<any>
+): Record<string, string[]> {
+  const result: Record<string, string[]> = {};
+
+  // Handle missing input
+  if (!formatted) return result;
+
+  // Process each field
+  for (const [field, error] of Object.entries(formatted)) {
+    // Skip the special _errors field - we'll handle it differently
+    if (field === "_errors") continue;
+
+    // If this field has direct errors, add them
+    if (error && "_errors" in error && Array.isArray(error._errors) && error._errors.length > 0) {
+      result[field] = error._errors;
+    }
+
+    // If this field has nested errors (object), recursively process them
+    if (error && typeof error === "object" && !Array.isArray(error) && !("_errors" in error)) {
+      const nestedErrors = flattenZodErrors(error as z.ZodFormattedError<any>);
+
+      // Add nested errors with path prefixing
+      for (const [nestedField, messages] of Object.entries(nestedErrors)) {
+        result[`${field}.${nestedField}`] = messages;
+      }
+    }
+  }
+
+  // Add top-level errors with special key if desired
+  if (formatted._errors && formatted._errors.length > 0) {
+    result["_form"] = formatted._errors;
+  }
+
+  return result;
+}
 
 // Base monetary value
 export const MonetarySchema = z.object({

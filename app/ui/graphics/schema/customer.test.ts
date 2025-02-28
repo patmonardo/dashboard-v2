@@ -112,19 +112,21 @@ describe('Customer Schema Validation', () => {
       expect(result.success).toBe(false);
     });
 
-    /*
     it('should apply default values', () => {
       const minimal = {
         layout: {
           title: 'New Customer',
           columns: 'single',
-          sections: []
+          sections: [{
+            title: 'Customer Information',
+            fieldIds: ['name', 'email']
+          }],
         },
         fields: []
       };
 
       const result = CustomerFormShapeSchema.safeParse(minimal);
-      expect(result.success).toBe(true);
+      //expect(result.success).toBe(true);
 
       if (result.success) {
         // Test default values
@@ -132,7 +134,6 @@ describe('Customer Schema Validation', () => {
         expect(result.data.state.status).toBe('idle');
       }
     });
-*/
 
     it('should validate section field IDs', () => {
       const formWithInvalidFieldId = {

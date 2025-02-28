@@ -44,11 +44,11 @@ export class DashboardModel {
       InvoiceModel.count(),
       CustomerModel.count(),
       prisma.invoice.aggregate({
-        where: { status: 'paid' },
+        where: { status: 'PAID' },
         _sum: { amount: true }
       }),
       prisma.invoice.aggregate({
-        where: { status: 'pending' },
+        where: { status: 'PENDING' },
         _sum: { amount: true }
       })
     ])

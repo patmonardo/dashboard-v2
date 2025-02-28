@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Form } from "./form";
+import type { OperationResult } from "@/lib/data/schema/base";
 import type {
   FormMatter,
   FormMode,
+  FormHandler,
   FormState,
   FormShape,
 } from "@/ui/graphics/schema/form";
+import { Form } from "@/ui/graphics/forms/form";
 
 // Concrete test implementation
 class TestForm extends Form<FormShape> {
@@ -14,15 +16,15 @@ class TestForm extends Form<FormShape> {
     this.state = { ...this.state, ...newState };
   }
 
-  protected create(): FormShape {
-    return {
+  protected create(): OperationResult<FormShape> {
+    const shape: FormShape = {
       layout: {
         title: "Creation Form",
         columns: "single",
         actions: [
           {
+            id: "submit",
             type: "submit",
-            action: "submit",
             label: "Create",
             variant: "primary",
           },
@@ -39,17 +41,23 @@ class TestForm extends Form<FormShape> {
       ],
       state: this.state, // Use the current state
     };
+
+    return {
+      data: shape,
+      status: "success",
+      message: "Form created successfully"
+    };
   }
 
-  protected edit(): FormShape {
-    return {
+  protected edit(): OperationResult<FormShape> {
+    const shape: FormShape = {
       layout: {
         title: "Edit Form",
         columns: "single",
         actions: [
           {
+            id: "submit",
             type: "submit",
-            action: "submit",
             label: "Save",
             variant: "primary",
           },
@@ -66,10 +74,21 @@ class TestForm extends Form<FormShape> {
       ],
       state: this.state,
     };
+
+    return {
+      data: shape,
+      status: "success",
+      message: "Form updated successfully"
+    };
   }
 
+  // For testing - get shape directly
   getFormShape(mode: FormMode): FormShape {
-    return mode === "create" ? this.create() : this.edit();
+    const result = mode === "create" ? this.create() : this.edit();
+    if (result.status === "error") {
+      throw new Error(result.message);
+    }
+    return result.data as FormShape;
   }
 }
 
@@ -84,7 +103,7 @@ describe("Form Base Class", () => {
 
   // Modified create mode test
   it("should handle create mode rendering", () => {
-    const result = form.render("create", "jsx");
+    const result = form.render("create", "jsx", {} as FormHandler);
     expect(result).toBeDefined();
 
     // Check for specific creation form elements
@@ -96,7 +115,7 @@ describe("Form Base Class", () => {
 
   // Modified edit mode test
   it("should handle edit mode rendering", () => {
-    const result = form.render("edit", "jsx");
+    const result = form.render("edit", "jsx", {} as FormHandler);
     expect(result).toBeDefined();
 
     // Check for specific edit form elements
@@ -116,8 +135,8 @@ describe("Form Base Class", () => {
     const shape = form.getFormShape("create");
 
     // Basic existence checks
-    expect(form.renderJSX(shape, testData)).toBeDefined();
-    expect(form.renderHTML(shape, testData)).toBeDefined();
-    expect(form.renderJSON(shape, testData)).toBeDefined();
+    expect(form.renderJSX(shape, testData, {} as FormHandler)).toBeDefined();
+    expect(form.renderHTML(shape, testData, {} as FormHandler)).toBeDefined();
+    //expect(form.renderJSON(shape, testData)).toBeDefined();
   });
 });

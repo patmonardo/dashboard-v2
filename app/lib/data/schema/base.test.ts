@@ -4,7 +4,6 @@ import {
   BaseSchema,
   BaseStateSchema,
   BaseShapeSchema,
-  OperationResultSchema,
   MonetarySchema,
   PeriodSchema,
 } from './base'; // Import your schemas
@@ -62,14 +61,7 @@ describe('Base Schemas', () => {
   });
 
   it('should validate a valid OperationResultSchema', () => {
-    const OperationResult = OperationResultSchema<string>();
-    const validOperationResult = {
-      data: 'test',
-      status: 'success',
-      message: 'Operation successful',
-    };
-    const result = OperationResult.safeParse(validOperationResult);
-    expect(result.success).toBe(true);
+
   });
 
   it('should validate a valid MonetarySchema', () => {

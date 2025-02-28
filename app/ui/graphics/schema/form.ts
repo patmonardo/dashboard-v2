@@ -7,32 +7,39 @@ export const FormMatterSchema = z.record(z.any()).optional();
 export const FormModeSchema = z.enum(["create", "edit"]).default("create");
 
 // Define FormMode type
-export const FormContentSchema = z
-  .enum(["jsx", "html", "json", "xml"])
-  .default("jsx");
+export const FormContentSchema = z.enum(["jsx", "html", "json", "xml"]).default("jsx");
 
 // Form content
-export const FormFieldOptionSchema = z.object({
+export const FormOptionSchema = z.object({
   value: z.string(),
   label: z.string(),
 });
 
+export const FormHandlerSchema = z.object({
+  submit: z.function(),
+  reset: z.function().optional(),
+  cancel: z.function().optional(),
+  delete: z.function().optional(),
+});
+
 // Form elements
 export const FormFieldSchema = z.object({
-  id: z.string(),
+  id: z.string(), // Link to FormMatter
   type: z.string(),
   label: z.string(),
-  required: z.boolean().default(false),
-  defaultValue: z.string().default(""),
-  options: z.array(FormFieldOptionSchema).optional(),
+  required: z.boolean(),
+  defaultValue: z.string(),
+  options: z.array(FormOptionSchema).optional(),
 });
 
 export const FormActionSchema = z.object({
+  id: z.string().default("submit"),// Link to FormHandler
   type: z.enum(["submit", "reset", "button"]).readonly(),
   label: z.string(),
   variant: z.enum(["primary", "secondary", "ghost"]),
-  action: z.enum(["submit", "reset", "cancel"]).optional().default("submit"),
+  options: z.array(FormOptionSchema).optional(),
 });
+
 
 // Form layout
 export const FormLayoutSchema = z.object({
@@ -50,8 +57,8 @@ export const FormStateSchema = z.object({
 
 // Form shape
 export const FormShapeSchema = z.object({
-  layout: FormLayoutSchema,
   fields: z.array(FormFieldSchema),
+  layout: FormLayoutSchema,
   state: FormStateSchema,
 });
 
@@ -59,7 +66,8 @@ export const FormShapeSchema = z.object({
 export type FormMatter = z.infer<typeof FormMatterSchema>;
 export type FormMode = z.infer<typeof FormModeSchema>;
 export type FormContent = z.infer<typeof FormContentSchema>;
-export type FormFieldOptions = z.infer<typeof FormFieldSchema>;
+export type FormOptions = z.infer<typeof FormOptionSchema>;
+export type FormHandler = z.infer<typeof FormHandlerSchema>;
 export type FormField = z.infer<typeof FormFieldSchema>;
 export type FormAction = z.infer<typeof FormActionSchema>;
 export type FormLayout = z.infer<typeof FormLayoutSchema>;
