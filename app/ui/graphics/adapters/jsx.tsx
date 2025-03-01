@@ -149,8 +149,6 @@ export class ShapeToJSXAdapter {
     // Get the currently selected value from data or default
     const selectedValue = data?.[field.id] || field.defaultValue || '';
 
-    console.log(`Select field ${field.id} rendering with selected value:`, selectedValue);
-
     return (
       <div className="mb-4">
         <label htmlFor={field.id} className="block text-sm font-medium mb-1">

@@ -13,7 +13,6 @@ export default async function Page() {
     submit: createCustomer,
     cancel: cancelCustomer,
   } as FormHandler);
-  console.log(result);
   if (result.status === "error") {
     notFound();
   }
