@@ -17,50 +17,73 @@ export abstract class Form<T extends FormShape> {
 
   constructor(protected readonly data?: FormMatter) {}
 
-  protected abstract create(): OperationResult<T>;
-  protected abstract edit(): OperationResult<T>;
+  protected abstract create(): Promise<OperationResult<T>>;
+  protected abstract edit(): Promise<OperationResult<T>>;
 
-  render(
+  // The render method also needs to be async now
+  async render(
     mode: FormMode,
     content: FormContent,
     handler: FormHandler
-  ): OperationResult<T> {
-    let node: React.ReactNode;
+  ): Promise<OperationResult<React.ReactNode | string>> {
     let result: OperationResult<T>;
 
-    switch (mode) {
-      case "create":
-        result = this.create();
-        break;
-      case "edit":
-        result = this.edit();
-        break;
-      default:
-        throw new Error(`Unsupported mode: ${mode}`);
+    try {
+      // Get the form shape based on mode
+      switch (mode) {
+        case "create":
+          result = await this.create();
+          break;
+        case "edit":
+          result = await this.edit();
+          break;
+        default:
+          throw new Error(`Unsupported mode: ${mode}`);
+      }
+
+      // If there was an error getting the form shape, return early
+      if (result.status === "error") {
+        return {
+          status: "error",
+          data: null,
+          message: result.message || "Failed to create form"
+        };
+      }
+
+      // Render the form in the requested format
+      const shape = result.data;
+      let form: React.ReactNode | string;
+
+      switch (content) {
+        case "jsx":
+          form = this.renderJSX(shape, this.data, handler);
+          break;
+        case "json":
+          form = this.renderJSON(shape, this.data, handler);
+          break;
+        case "html":
+          form = this.renderHTML(shape, this.data, handler);
+          break;
+        case "xml":
+          form = this.renderXML(shape, this.data, handler);
+          break;
+        default:
+          throw new Error(`Unsupported format: ${content}`);
+      }
+
+      return {
+        status: "success",
+        data: form,
+        message: "Form rendered successfully"
+      };
+    } catch (error) {
+      console.error("Error rendering form:", error);
+      return {
+        status: "error",
+        data: null,
+        message: "Failed to render form"
+      };
     }
-    if (result.status == "error") {
-      return result;
-    }
-    const shape = result.data as T;
-    let form: any;
-    switch (content) {
-      case "jsx":
-        form = this.renderJSX(shape, this.data, handler);
-        break;
-      case "json":
-        form = this.renderJSON(shape, this.data, handler);
-        break;
-      case "html":
-        form = this.renderHTML(shape, this.data, handler);
-        break;
-      case "xml":
-        form = this.renderXML(shape, this.data, handler);
-        break;
-      default:
-        throw new Error(`Unsupported format: ${content}`);
-    }
-    result.data = form;
-    return result;
   }
 
   renderJSX(

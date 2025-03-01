@@ -12,6 +12,10 @@ import type {
   CreateInvoice,
   UpdateInvoice,
 } from "@/lib/data/schema/invoice";
+import {
+  type InvoiceWithCustomer,
+  InvoiceWithCustomerSchema,
+} from "@/lib/data/schema/invoice";
 import { BaseModel } from "./base";
 
 export class InvoiceModel extends BaseModel<InvoiceShape> {
@@ -136,41 +140,45 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
       };
     }
   }
-  static async findAll(options: {
+
+  static async findAll({
+    query = "",
+    page = 1,
+    pageSize = 10,
+  }: {
     query?: string;
     page?: number;
     pageSize?: number;
-  }): Promise<OperationResult<(Invoice & { customer: Pick<Customer, 'name' | 'email' | 'imageUrl'> })[]>> {
+  }): Promise<OperationResult<InvoiceWithCustomer[]>> {
     try {
-      const { page = 1, pageSize = 10, query = '' } = options;
-      const offset = (page - 1) * pageSize;
+      const skip = (page - 1) * pageSize;
+      console.log("Query params:", { skip, take: pageSize, query });
 
       const invoices = await prisma.invoice.findMany({
-        skip: offset,
+        skip,
         take: pageSize,
         include: {
-          customer: {
-            select: {
-              name: true,
-              email: true,
-              imageUrl: true,
-            },
-          },
+          customer: true,
         },
-        orderBy: { date: "desc" },
+        orderBy: {
+          date: "desc",
+        },
       });
+
+      console.log("Invoices found:", invoices.length);
+      console.log("Sample invoice:", invoices[0]);
 
       return {
         status: "success",
         data: invoices,
-        message: "Invoices retrieved successfully", // Fixed: was "Customers"
+        message: "Invoices retrieved successfully",
       };
     } catch (error) {
-      console.error("Error fetching invoices:", error); // Fixed: was "customers"
+      console.error("Error fetching invoices:", error);
       return {
         status: "error",
         data: null,
-        message: "Failed to retrieve invoices", // Fixed: was "customers"
+        message: "Failed to fetch invoices",
       };
     }
   }

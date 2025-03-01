@@ -5,18 +5,18 @@ import type { OperationResult } from '@/lib/data/schema/base';
 export abstract class FormView<T extends FormShape> {
   constructor(protected readonly form: Form<T>) {}
 
-  public render(
+  public async render(
     mode: FormMode,
     content: FormContent,
     handler: FormHandler
-  ): OperationResult<any> {
+  ): Promise<OperationResult<any>> {
     let form: any;
     switch (content) {
       case 'jsx':
       case 'json':
       case 'html':
       case 'xml':
-        return (this.form.render(mode, content, handler));
+        return await this.form.render(mode, content, handler);
       default:
         throw new Error(`Unsupported content type: ${content}`);
     }

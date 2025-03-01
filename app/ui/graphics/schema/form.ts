@@ -28,7 +28,7 @@ export const FormFieldSchema = z.object({
   type: z.string(),
   label: z.string(),
   required: z.boolean(),
-  defaultValue: z.string(),
+  defaultValue: z.string().optional(),
   options: z.array(FormOptionSchema).optional(),
 });
 

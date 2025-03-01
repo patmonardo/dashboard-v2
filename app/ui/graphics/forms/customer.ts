@@ -1,15 +1,15 @@
-import { Form } from "./form";
 import type { OperationResult } from "@/lib/data/schema/base";
 import type { Customer } from "@/lib/data/schema/customer";
 import type { CustomerFormShape } from "@/ui/graphics/schema/customer";
 import { CustomerFormShapeSchema } from "@/ui/graphics/schema/customer";
+import { Form } from "./form";
 
 export class CustomerForm extends Form<CustomerFormShape> {
   constructor(private readonly customer?: Customer) {
     super(customer);
   }
 
-  private getFormShape(mode: "create" | "edit"): CustomerFormShape {
+  private async getFormShape(mode: "create" | "edit"): Promise<CustomerFormShape> {
     const isCreate = mode === "create";
 
     return CustomerFormShapeSchema.parse({
@@ -26,7 +26,6 @@ export class CustomerForm extends Form<CustomerFormShape> {
           {
             id: "submit",
             type: "submit",
-            action: "submit",
             label: isCreate ? "Create Customer" : "Save Changes",
             variant: "primary",
           },
@@ -55,7 +54,7 @@ export class CustomerForm extends Form<CustomerFormShape> {
         },
         {
           id: "imageUrl",
-          type: "url",
+          type: "text",
           label: "Image URL",
           required: false,
           defaultValue: isCreate ? "" : (this.customer?.imageUrl || ""),
@@ -67,9 +66,9 @@ export class CustomerForm extends Form<CustomerFormShape> {
     });
   }
 
-  create(): OperationResult<CustomerFormShape> {
+  async create(): Promise<OperationResult<CustomerFormShape>> {
     try {
-      const shape = this.getFormShape("create");
+      const shape = await this.getFormShape("create");
       return {
         data: shape,
         status: "success",
@@ -84,9 +83,9 @@ export class CustomerForm extends Form<CustomerFormShape> {
     }
   }
 
-  edit(): OperationResult<CustomerFormShape> {
+  async edit(): Promise<OperationResult<CustomerFormShape>> {
     try {
-      const shape = this.getFormShape("edit");
+      const shape = await this.getFormShape("edit");
       return {
         data: shape,
         status: "success",

@@ -1,6 +1,6 @@
 // filepath: /home/pat/VSCode/dashboard-v2/app/ui/graphics/schema/invoice.ts
 import { z } from "zod";
-import { FormActionSchema, FormShapeSchema } from "./form";
+import { FormOptionSchema, FormActionSchema, FormShapeSchema } from "./form";
 
 // Invoice field identifiers
 const InvoiceFieldId = z.enum(["customerId", "amount", "date", "status"]);
@@ -14,7 +14,8 @@ export const InvoiceFieldShapeSchema = z.object({
   type: InvoiceFieldType,
   label: z.string(),
   required: z.boolean().default(false),
-  defaultValue: z.string(),
+  defaultValue: z.string().optional(),
+  options: z.array(FormOptionSchema).optional(),
 });
 
 // Extend the base layout so that actions remain available,

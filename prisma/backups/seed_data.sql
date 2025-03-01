@@ -16,6 +16,7 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+
 --
 -- Name: InvoiceStatus; Type: TYPE; Schema: public; Owner: pat
 --
@@ -33,6 +34,11 @@ ALTER TYPE public."InvoiceStatus" OWNER TO pat;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+DROP TABLE public."Revenue";
+DROP TABLE public."Invoice";
+DROP TABLE public."Customer";
+DROP TABLE public."User";
 
 --
 -- Name: Customer; Type: TABLE; Schema: public; Owner: pat

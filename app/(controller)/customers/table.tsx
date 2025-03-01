@@ -1,10 +1,15 @@
 import Image from "next/image";
 import { Customer } from "@/lib/data/schema/customer";
-import {
-  UpdateCustomer,
-  DeleteCustomer,
-} from "@/(controller)/customers/buttons";
 import { CustomerModel } from "@/lib/model/customer";
+import UpdateCustomerButton from "./buttons/update";
+import DeleteCustomerButton from "./buttons/delete";
+
+const DEFAULT_IMAGE = '/icons/favicon.ico';
+
+export async function totalPages(pageSize = 10): Promise<number> {
+  const totalCustomers = await CustomerModel.count();
+  return Math.ceil(totalCustomers / pageSize);
+}
 
 export default async function CustomersTable({
   query,
@@ -27,9 +32,6 @@ export default async function CustomersTable({
     customers = result.data;
   }
 
-  // Default image if customer doesn't have one
-  const defaultImage = '/placeholder-user.jpg';
-
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
@@ -45,7 +47,7 @@ export default async function CustomersTable({
                   <div className="flex items-center justify-between border-b pb-4">
                     <div className="flex items-center">
                       <Image
-                        src={customer.imageUrl || defaultImage}
+                        src={customer.imageUrl || DEFAULT_IMAGE}
                         alt={`${customer.name}'s profile picture`}
                         className="mr-2 rounded-full"
                         width={28}
@@ -59,8 +61,8 @@ export default async function CustomersTable({
                   </div>
                   <div className="flex w-full items-center justify-between pt-4">
                     <div className="flex justify-end gap-2">
-                      <UpdateCustomer id={customer.id} />
-                      <DeleteCustomer id={customer.id} />
+                      <UpdateCustomerButton id={customer.id} />
+                      <DeleteCustomerButton id={customer.id} />
                     </div>
                   </div>
                 </div>
@@ -95,7 +97,7 @@ export default async function CustomersTable({
                     <td className="whitespace-nowrap py-3 pl-6 pr-3">
                       <div className="flex items-center gap-3">
                         <Image
-                          src={customer.imageUrl || defaultImage}
+                          src={customer.imageUrl || DEFAULT_IMAGE}
                           className="rounded-full"
                           width={28}
                           height={28}
@@ -109,8 +111,8 @@ export default async function CustomersTable({
                     </td>
                     <td className="whitespace-nowrap py-3 pl-6 pr-3">
                       <div className="flex justify-end gap-3">
-                        <UpdateCustomer id={customer.id} />
-                        <DeleteCustomer id={customer.id} />
+                        <UpdateCustomerButton id={customer.id} />
+                        <DeleteCustomerButton id={customer.id} />
                       </div>
                     </td>
                   </tr>

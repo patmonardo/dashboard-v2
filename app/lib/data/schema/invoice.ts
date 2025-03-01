@@ -1,12 +1,13 @@
 import { z } from 'zod'
 import { BaseSchema, BaseStateSchema } from './base'
+import { CustomerSchema } from './customer'
 
 // Base Invoice Schema
 export const InvoiceSchema = BaseSchema.extend({
   customerId: z.string().uuid(),
   amount: z.number().int().positive(), // Ensure amount is positive
   status: z.enum(['PENDING', 'PAID', 'OVERDUE', 'DRAFT'] as const), // Restore the enum
-  date: z.date().optional()
+  date: z.coerce.date(),
 })
 
 // Invoice state schema
@@ -36,8 +37,14 @@ export const UpdateInvoiceSchema = InvoiceSchema.omit({
   updatedAt: true
 }).partial()  // Makes all fields optional for updates
 
+// Invoice with Customer relationship
+export const InvoiceWithCustomerSchema = InvoiceSchema.extend({
+  customer: CustomerSchema,
+});
+
 export type Invoice = z.infer<typeof InvoiceSchema>
 export type InvoiceState = z.infer<typeof InvoiceStateSchema>
 export type InvoiceShape = z.infer<typeof InvoiceShapeSchema>
 export type CreateInvoice = z.infer<typeof CreateInvoiceSchema>
 export type UpdateInvoice = z.infer<typeof UpdateInvoiceSchema>
+export type InvoiceWithCustomer = z.infer<typeof InvoiceWithCustomerSchema>;

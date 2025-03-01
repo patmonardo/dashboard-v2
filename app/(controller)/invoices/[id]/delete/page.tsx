@@ -5,10 +5,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = params.id;
   const result = await InvoiceModel.delete(id);
-  if (result.status === "error") {
+  if (result.status !== "success") {
     notFound();
   }
-  if (result.status === "success") {
-    redirect("/invoices");
-  }
+  redirect("/invoices");
 }

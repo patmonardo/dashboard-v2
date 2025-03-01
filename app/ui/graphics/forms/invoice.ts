@@ -1,20 +1,35 @@
-import { Form } from "./form";
+import type { OperationResult } from "@/lib/data/schema/base";
 import type { Invoice } from "@/lib/data/schema/invoice";
+import { CustomerModel } from "@/lib/model/customer";
 import { InvoiceFormShapeSchema } from "@/ui/graphics/schema/invoice";
 import type { InvoiceFormShape } from "@/ui/graphics/schema/invoice";
-import type { OperationResult } from "@/lib/data/schema/base";
+import { Form } from "./form";
 
 export class InvoiceForm extends Form<InvoiceFormShape> {
   constructor(private readonly invoice?: Invoice) {
     super(invoice);
   }
 
-  private getFormShape(mode: "create" | "edit"): InvoiceFormShape {
+  private async getFormShape(
+    mode: "create" | "edit"
+  ): Promise<InvoiceFormShape> {
     const isCreate = mode === "create";
+
+    // Get customer data for the dropdown
+    const result = await CustomerModel.findAll();
+
+    if (result.status !== "success") {
+      // Handle error case
+      throw new Error("Failed to load customers");
+    }
+
+    const customers = result.data;
+
     // Format date properly if it exists
     const formattedDate = this.invoice?.date
       ? new Date(this.invoice.date).toISOString().split("T")[0]
       : "";
+
     return InvoiceFormShapeSchema.parse({
       layout: {
         title: isCreate ? "Create Invoice" : "Edit Invoice",
@@ -27,16 +42,16 @@ export class InvoiceForm extends Form<InvoiceFormShape> {
         ],
         actions: [
           {
-            type: "button",
-            action: "cancel",
-            label: "Cancel",
-            variant: "secondary",
+            id: "submit",
+            type: "submit",
+            label: mode === "create" ? "Create" : "Save Changes",
+            variant: "primary",
           },
           {
-            type: "submit",
-            action: "submit",
-            label: isCreate ? "Create Invoice" : "Save Changes",
-            variant: "primary",
+            id: "cancel",
+            label: "Cancel",
+            type: "button",
+            variant: "secondary",
           },
         ],
       },
@@ -46,28 +61,34 @@ export class InvoiceForm extends Form<InvoiceFormShape> {
           type: "select",
           label: "Customer",
           required: true,
-          defaultValue: isCreate ? "" : this.invoice?.customerId || "",
+          options: customers.map((c) => ({
+            value: c.id,
+            label: c.name,
+          })),
         },
         {
           id: "amount",
           type: "number",
           label: "Amount ($)",
           required: true,
-          defaultValue: isCreate ? "" : this.invoice?.amount?.toString() || "",
         },
         {
           id: "status",
           type: "select",
           label: "Status",
           required: true,
-          defaultValue: isCreate ? "" : this.invoice?.status || "",
+          options: [
+            { value: "PAID", label: "Paid" },
+            { value: "PENDING", label: "Pending" },
+            { value: "OVERDUE", label: "Overdue" },
+          ],
         },
         {
           id: "date",
           type: "date",
           label: "Date",
           required: true,
-          defaultValue: isCreate ? "" : formattedDate,
+          defaultValue: formattedDate, // Set default for edit mode
         },
       ],
       state: {
@@ -76,15 +97,16 @@ export class InvoiceForm extends Form<InvoiceFormShape> {
     });
   }
 
-  create(): OperationResult<InvoiceFormShape> {
+  async create(): Promise<OperationResult<InvoiceFormShape>> {
     try {
-      const shape = this.getFormShape("create");
+      const shape = await this.getFormShape("create");
       return {
         data: shape,
         status: "success",
         message: "Form created successfully",
       };
-    } catch {
+    } catch (error) {
+      console.error("Error creating invoice form:", error);
       return {
         data: null,
         status: "error",
@@ -93,15 +115,16 @@ export class InvoiceForm extends Form<InvoiceFormShape> {
     }
   }
 
-  edit(): OperationResult<InvoiceFormShape> {
+  async edit(): Promise<OperationResult<InvoiceFormShape>> {
     try {
-      const shape = this.getFormShape("edit");
+      const shape = await this.getFormShape("edit");
       return {
         data: shape,
         status: "success",
         message: "Invoice created successfully",
       };
-    } catch {
+    } catch (error) {
+      console.error("Error creating invoice form:", error);
       return {
         data: null,
         status: "error",

@@ -1,3 +1,4 @@
+/*
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -48,7 +49,6 @@ export async function updateInvoice(id: string, formData: FormData) {
 
     revalidatePath("/invoices");
     redirect("/invoices");
-
 }
 
 export async function deleteInvoice(id: string) {
@@ -64,11 +64,11 @@ export async function deleteInvoice(id: string) {
     return { message: "Invoice deleted successfully" };
 }
 
-// Create invoice with error handling
+// Cancel invoice
 export async function cancelInvoice(
   prev_state: InvoiceState,
   formData: FormData
 ) {
-    revalidatePath("/invoices");
     redirect("/invoices");
 }
+*/

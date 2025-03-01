@@ -146,7 +146,7 @@ export class CustomerModel extends BaseModel<CustomerShape> {
     query?: string;
     page?: number;
     pageSize?: number;
-  }): Promise<OperationResult<Customer[]>> {
+  }= {}): Promise<OperationResult<Customer[]>> {
     try {
       let customers: Customer[] = [];
 

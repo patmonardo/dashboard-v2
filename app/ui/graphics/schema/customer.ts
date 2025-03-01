@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FormShapeSchema, FormActionSchema } from "./form";
+import { FormOptionSchema, FormActionSchema, FormShapeSchema } from "./form";
 
 // Customer field identifiers
 const CustomerFieldId = z.enum(["name", "email", "imageUrl"]);
@@ -13,7 +13,8 @@ export const CustomerFieldShapeSchema = z.object({
   type: CustomerFieldType,
   label: z.string(),
   required: z.boolean().default(false),
-  defaultValue: z.string(),
+  defaultValue: z.string().optional(),
+  options: z.array(FormOptionSchema).optional(),
 });
 
 // The complete customer form shape
