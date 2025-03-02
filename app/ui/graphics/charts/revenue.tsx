@@ -1,3 +1,4 @@
+//@/ui/graphics/charts/revenue.tsx
 'use client';
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';

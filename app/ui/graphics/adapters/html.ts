@@ -1,3 +1,4 @@
+//@/ui/graphics/adapters/html.ts
 import { FormMatter, FormField, FormShape } from "@/ui/graphics/schema/form";
 
 export class ShapeToHTMLAdapter {

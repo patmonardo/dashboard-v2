@@ -1,3 +1,4 @@
+//ui/graphics/adapters/jsx.tsx
 import React from "react";
 import { z } from "zod";
 

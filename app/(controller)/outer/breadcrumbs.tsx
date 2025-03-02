@@ -1,3 +1,4 @@
+//@/(controller)/outer/breadcrumbs.tsx
 import { clsx } from 'clsx';
 import Link from 'next/link';
 import { lusitana } from '@/ui/graphics/fonts/lusitana';

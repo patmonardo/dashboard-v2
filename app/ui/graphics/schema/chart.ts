@@ -1,3 +1,4 @@
+//@/ui/graphics/schema/chart.ts
 import { z } from 'zod'
 import { FormShapeSchema } from './form'
 import { DataSchema, VisualSchema } from './visualization'

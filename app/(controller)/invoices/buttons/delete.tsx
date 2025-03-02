@@ -1,3 +1,4 @@
+//@/(controller)/invoices/buttons/delete.tsx
 import Link from "next/link";
 import { TrashIcon } from "@heroicons/react/24/outline";
 

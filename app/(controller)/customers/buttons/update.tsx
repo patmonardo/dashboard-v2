@@ -1,3 +1,4 @@
+//@/(controller)/customers/buttons/update.tsx
 import Link from "next/link";
 import { PencilIcon } from "@heroicons/react/24/outline";
 

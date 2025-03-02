@@ -1,3 +1,4 @@
+//@/(controller)/customers/[id]/delete/page.tsx
 import { notFound, redirect } from "next/navigation";
 import { CustomerModel } from "@/lib/model/customer";
 

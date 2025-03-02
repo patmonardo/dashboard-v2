@@ -1,3 +1,4 @@
+//@/lib/model/dashboard.ts
 import { OperationResult } from "@/lib/data/schema/base";
 import { CustomerModel } from "@/lib/model/customer";
 import { InvoiceModel } from "@/lib/model/invoice";

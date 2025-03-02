@@ -1,6 +1,5 @@
+//@/lib/data/schema/base.ts
 import { z } from 'zod'
-import { Decimal } from '@prisma/client/runtime/library'
-import { error } from 'console'
 
 // Base Schema (all entities have these properties)
 export const BaseSchema = z.object({

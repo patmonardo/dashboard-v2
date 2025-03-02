@@ -1,3 +1,4 @@
+//@/lib/data/schema/index.ts
 import { Decimal } from '@prisma/client/runtime/library'
 
 export const formatCurrency = (amount: number | Decimal) => {

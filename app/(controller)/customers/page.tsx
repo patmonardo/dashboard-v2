@@ -1,10 +1,11 @@
+//@/(controller)/customers/page.tsx
 import { Suspense } from 'react'
 import { inter } from '@/ui/graphics/fonts/inter'
-import Search from '@/(controller)/controllers/search'
+import Search from '@/(controller)/outer/search'
 import Table from '@/(controller)/customers/table'
-import Pagination from '@/(controller)/controllers/pagination'
+import Pagination from '@/(controller)/outer/pagination'
 import { totalPages } from '@/(controller)/customers/table'
-import { CustomersTableSkeleton } from '@/(controller)/controllers/skeletons'
+import { CustomersTableSkeleton } from '@/(controller)/outer/skeletons'
 import CreateCustomerButton from './buttons/create'
 
 export default async function Page(props: {

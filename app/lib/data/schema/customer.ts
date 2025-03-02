@@ -1,3 +1,4 @@
+//@/lib/data/schema/customer.ts
 import { z } from 'zod'
 import { BaseSchema, BaseStateSchema } from './base'
 

@@ -1,3 +1,4 @@
+//@/lib/data/schema/dashboard.ts
 import { z } from 'zod'
 
 // Widget types we support

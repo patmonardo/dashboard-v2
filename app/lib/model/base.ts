@@ -1,3 +1,4 @@
+//@/lib/model/base.ts
 import { z } from 'zod'
 import type { Base, BaseState, BaseShape } from '../data/schema/base'
 

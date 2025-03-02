@@ -1,4 +1,4 @@
-import { InvoiceSchema, type Invoice } from '@/lib/data/schema/invoice';
+//@/(controller)/invoices/status.tsx
 import clsx from 'clsx';
 
 export default function InvoiceStatus({ status }: { status: string }) {

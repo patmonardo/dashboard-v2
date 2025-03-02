@@ -1,4 +1,5 @@
-'use client';
+//@/(controller)/invoices/error.tsx
+"use client";
 
 import { useEffect } from 'react';
 

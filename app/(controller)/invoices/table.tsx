@@ -1,8 +1,9 @@
+//@/(controller)/invoices/table.tsx
 import Image from "next/image";
-import { InvoiceWithCustomer } from "@/lib/data/schema/invoice";
-import { formatDateToLocal, formatCurrency } from "@/lib/data/formatting";
 import InvoiceStatus from "@/(controller)/invoices/status";
 import { InvoiceModel } from "@/lib/model/invoice";
+import { InvoiceWithCustomer } from "@/lib/data/schema/invoice";
+import { formatDateToLocal, formatCurrency } from "@/lib/data/formatting";
 import UpdateInvoiceButton from "./buttons/update";
 import DeleteInvoiceButton from "./buttons/delete";
 

@@ -1,6 +1,8 @@
+//@/(controller)/customers/[id]/edit/page.tsx
 "use server";
+
 import { notFound, redirect } from "next/navigation";
-import Breadcrumbs from "@/(controller)/controllers/breadcrumbs";
+import Breadcrumbs from "@/(controller)/outer/breadcrumbs";
 import { CustomerModel } from "@/lib/model/customer";
 import type { FormHandler } from "@/ui/graphics/schema/form";
 import { CustomerView } from "@/ui/view/customer";

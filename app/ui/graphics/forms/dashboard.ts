@@ -1,3 +1,4 @@
+//@/ui/graphics/forms/dashboard.tsx
 import { DashboardFormShape } from '../schema/dashboard'
 import type { Dashboard } from '../../../lib/data/schema/dashboard'
 

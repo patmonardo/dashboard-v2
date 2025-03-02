@@ -1,3 +1,4 @@
+//@/ui/graphics/schema/font.ts
 import { z } from 'zod'
 import { FormShapeSchema } from './form'
 import type { NextFontWithVariable } from 'next/dist/compiled/@next/font'

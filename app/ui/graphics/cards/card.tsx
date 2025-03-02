@@ -1,3 +1,4 @@
+//@/ui/graphics/cards/card.tsx
 import React from 'react';
 import {
   BanknotesIcon,

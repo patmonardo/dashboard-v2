@@ -1,3 +1,4 @@
+//@/(controller)/customers/actions/delete.tsx
 "use server";
 
 import { revalidatePath } from 'next/cache';

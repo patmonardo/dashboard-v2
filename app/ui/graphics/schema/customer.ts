@@ -1,3 +1,4 @@
+//@/ui/graphics/schema/customer.ts
 import { z } from "zod";
 import { FormOptionSchema, FormActionSchema, FormShapeSchema } from "./form";
 

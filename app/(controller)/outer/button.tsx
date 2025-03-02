@@ -1,3 +1,4 @@
+//@/(controller)/outer/button.tsx
 import clsx from 'clsx';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

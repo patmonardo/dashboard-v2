@@ -1,3 +1,4 @@
+//@/ui/graphics/forms/invoice.tsx
 import type { OperationResult } from "@/lib/data/schema/base";
 import type { Invoice } from "@/lib/data/schema/invoice";
 import { CustomerModel } from "@/lib/model/customer";

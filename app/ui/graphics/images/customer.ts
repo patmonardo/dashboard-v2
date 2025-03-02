@@ -1,6 +1,7 @@
+//@/ui/graphics/cards/revenue.tsx
+import type { OperationResult } from '@/lib/data/schema/base';
 import { ImageShapeSchema, type ImageShape } from '@/ui/graphics/schema/image';
 import { Image } from './image';
-import type { OperationResult } from '@/lib/data/schema/base';
 
 export class CustomerImage extends Image<ImageShape> {
   constructor(private readonly config: Partial<ImageShape>) {

@@ -1,4 +1,5 @@
-'use client';
+//@/(controller)/outer/navlinks.tsx
+"use client";
 
 import {
   UserGroupIcon,

@@ -1,3 +1,4 @@
+//@/ui/graphics/forms/form.tsx
 import React from "react";
 import type {
   FormMatter,
@@ -20,7 +21,6 @@ export abstract class Form<T extends FormShape> {
   protected abstract create(): Promise<OperationResult<T>>;
   protected abstract edit(): Promise<OperationResult<T>>;
 
-  // The render method also needs to be async now
   async render(
     mode: FormMode,
     content: FormContent,

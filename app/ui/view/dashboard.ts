@@ -1,4 +1,4 @@
-
+//@/ui/view/dashboard.ts
 import { InvoiceWithCustomer } from '@/lib/data/schema/invoice';
 import { DashboardModel } from '@/lib/model/dashboard';
 

@@ -1,4 +1,5 @@
-'use client';
+//@/(controller)/outer/search.tsx
+"use client";
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';

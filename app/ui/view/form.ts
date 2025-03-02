@@ -1,3 +1,4 @@
+//@/ui/view/form.tsx
 import { Form } from '@/ui/graphics/forms/form'
 import type  { FormShape, FormMode, FormContent, FormHandler } from '@/ui/graphics/schema/form'
 import type { OperationResult } from '@/lib/data/schema/base';

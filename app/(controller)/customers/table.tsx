@@ -1,3 +1,4 @@
+//@/(controller)/customers/table.tsx
 import Image from "next/image";
 import { Customer } from "@/lib/data/schema/customer";
 import { CustomerModel } from "@/lib/model/customer";

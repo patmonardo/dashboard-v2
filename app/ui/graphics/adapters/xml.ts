@@ -1,3 +1,4 @@
+//@/ui/graphics/adapters/xml.ts
 import type { FormMatter, FormField, FormShape,  } from '@/ui/graphics/schema/form';
 
 export class ShapeToXMLAdapter {

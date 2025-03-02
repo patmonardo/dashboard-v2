@@ -1,5 +1,6 @@
+//@/(controller)/invoices/[id]/edit/page.tsx
 import { notFound, redirect } from "next/navigation";
-import Breadcrumbs from "@/(controller)/controllers/breadcrumbs";
+import Breadcrumbs from "@/(controller)/outer/breadcrumbs";
 import type { Invoice } from "@/lib/data/schema/invoice";
 import { InvoiceModel } from "@/lib/model/invoice";
 import { FormHandler } from "@/ui/graphics/schema/form";

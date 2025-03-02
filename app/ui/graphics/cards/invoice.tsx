@@ -1,3 +1,4 @@
+//@/ui/graphics/cards/invoice.tsx
 import { InvoiceWithCustomer } from '@/lib/data/schema/invoice';
 
 interface LatestInvoicesCardProps {

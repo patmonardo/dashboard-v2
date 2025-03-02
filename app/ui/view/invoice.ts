@@ -1,3 +1,4 @@
+//@/ui/view/invoice.ts
 import { Invoice } from '@/lib/data/schema/invoice'
 import { InvoiceForm } from '@/ui/graphics/forms/invoice'
 import { InvoiceFormShape } from '@/ui/graphics/schema/invoice'

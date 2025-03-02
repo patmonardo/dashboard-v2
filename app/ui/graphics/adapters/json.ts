@@ -1,3 +1,4 @@
+//@/ui/graphics/adapters/json.ts
 import type { FormMatter, FormShape } from '@/ui/graphics/schema/form';
 
 export class ShapeToJSONAdapter {

@@ -1,3 +1,4 @@
+//@/lib/model/customer.ts
 import { prisma } from "@/lib/data/client";
 import type { OperationResult } from "@/lib/data/schema/base";
 import {

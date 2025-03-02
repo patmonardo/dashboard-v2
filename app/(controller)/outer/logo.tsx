@@ -1,3 +1,4 @@
+//@/(controller)/outer/logo.tsx
 import { GlobeAltIcon } from '@heroicons/react/24/outline';
 
 export function AcmeLogo() {

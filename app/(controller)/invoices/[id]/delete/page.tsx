@@ -1,3 +1,4 @@
+//@/(controller)/invoices/[id]/delete/page.tsx
 import { notFound, redirect } from "next/navigation";
 import { InvoiceModel } from "@/lib/model/invoice";
 

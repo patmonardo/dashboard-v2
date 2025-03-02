@@ -1,3 +1,4 @@
+//@/ui/view/customer.ts
 import { Customer } from '@/lib/data/schema/customer';
 import { CustomerForm } from '@/ui/graphics/forms/customer';
 import { CustomerFormShape } from '@/ui/graphics/schema/customer';

@@ -1,3 +1,4 @@
+//@/(controller)/outer/card.tsx
 import {
   BanknotesIcon,
   ClockIcon,

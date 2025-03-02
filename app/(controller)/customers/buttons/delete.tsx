@@ -1,4 +1,4 @@
-// app/(controller)/customers/buttons/delete.tsx
+//@/(controller)/customers/buttons/delete.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';

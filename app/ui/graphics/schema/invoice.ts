@@ -1,4 +1,4 @@
-// filepath: /home/pat/VSCode/dashboard-v2/app/ui/graphics/schema/invoice.ts
+//@/ui/graphics/schema/invoice.ts
 import { z } from "zod";
 import { FormOptionSchema, FormActionSchema, FormShapeSchema } from "./form";
 

@@ -1,3 +1,4 @@
+//@/ui/graphics/forms/customer.tsx
 import type { OperationResult } from "@/lib/data/schema/base";
 import type { Customer } from "@/lib/data/schema/customer";
 import type { CustomerFormShape } from "@/ui/graphics/schema/customer";

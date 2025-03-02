@@ -1,3 +1,4 @@
+//@/lib/model/invoice.ts
 import { prisma } from "@/lib/data/client";
 import type { OperationResult } from "@/lib/data/schema/base";
 import type { Customer } from "@/lib/data/schema/customer";
@@ -231,7 +232,8 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
   static async getRevenueByMonth(): Promise<
     OperationResult<{ month: string; revenue: number }[]>
   > {
-    try {
+    /*
+     try {
       // For PostgreSQL
       const invoicesByMonth = await prisma.$queryRaw`
       SELECT
@@ -250,33 +252,32 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
       };
     } catch (error) {
       console.error("Error getting revenue by month:", error);
+*/
+    // Return placeholder data if the query fails
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const placeholderData = months.map((month) => ({
+      month,
+      revenue: Math.floor(Math.random() * 5000) + 1000,
+    }));
 
-      // Return placeholder data if the query fails
-      const months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
-      const placeholderData = months.map((month) => ({
-        month,
-        revenue: Math.floor(Math.random() * 5000) + 1000,
-      }));
-
-      return {
-        status: "success", // We return success with placeholder data
-        data: placeholderData,
-        message: "Using placeholder revenue data (query failed)",
-      };
-    }
+    return {
+      status: "success", // We return success with placeholder data
+      data: placeholderData,
+      message: "Using placeholder revenue data (query failed)",
+    };
   }
 
   // More flexible method that can handle different time periods

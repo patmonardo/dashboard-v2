@@ -1,16 +1,12 @@
+//#/(controller)/dashboard/page.tsx
 import { Suspense } from "react";
 import { DashboardModel } from "@/lib/model/dashboard";
 import { DashboardView } from "@/ui/view/dashboard";
 import { StatCard } from "@/ui/graphics/cards/card";
-import {
-  RevenueChartWrapper,
-  LatestInvoicesWrapper,
-} from "@/(controller)/controllers/revenue";
-import {
-  RevenueChartSkeleton,
-  LatestInvoicesSkeleton,
-} from "@/(controller)/controllers/skeletons";
-import styles from '@/app/ui/home.module.css';
+import { LatestInvoicesWrapper } from "@/(controller)/inner/invoice";
+import { RevenueChartWrapper } from "@/(controller)/inner/revenue";
+import { RevenueChartSkeleton } from "@/(controller)/outer/skeletons";
+import { LatestInvoicesSkeleton } from "@/(controller)/outer/skeletons";
 
 export default async function Page() {
   // Fetch data using the model
