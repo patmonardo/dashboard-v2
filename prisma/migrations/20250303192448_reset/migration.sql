@@ -1,11 +1,5 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Task` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-DROP TABLE "Task";
+-- CreateEnum
+CREATE TYPE "InvoiceStatus" AS ENUM ('PENDING', 'PAID', 'OVERDUE', 'DRAFT');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -35,8 +29,8 @@ CREATE TABLE "Customer" (
 CREATE TABLE "Invoice" (
     "id" TEXT NOT NULL,
     "customerId" TEXT NOT NULL,
-    "amount" DECIMAL(10,2) NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'pending',
+    "amount" INTEGER NOT NULL,
+    "status" "InvoiceStatus" NOT NULL DEFAULT 'PENDING',
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -48,8 +42,8 @@ CREATE TABLE "Invoice" (
 CREATE TABLE "Revenue" (
     "id" TEXT NOT NULL,
     "month" TIMESTAMP(3) NOT NULL,
-    "revenue" DECIMAL(10,2) NOT NULL,
-    "expenses" DECIMAL(10,2) NOT NULL,
+    "revenue" INTEGER NOT NULL,
+    "expenses" INTEGER NOT NULL,
 
     CONSTRAINT "Revenue_pkey" PRIMARY KEY ("id")
 );
@@ -59,9 +53,6 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Customer_email_key" ON "Customer"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Revenue_month_key" ON "Revenue"("month");
 
 -- AddForeignKey
 ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
