@@ -1,6 +1,7 @@
 //@/ui/graphics/schema/invoice.ts
 import { z } from "zod";
 import { FormOptionSchema, FormActionSchema, FormShapeSchema } from "./form";
+import { InvoiceStatusSchema } from "@/lib/data/schema/invoice";
 
 // Invoice field identifiers
 const InvoiceFieldId = z.enum(["customerId", "amount", "date", "status"]);
@@ -35,5 +36,21 @@ export const InvoiceFormShapeSchema = FormShapeSchema.extend({
   fields: z.array(InvoiceFieldShapeSchema),
 });
 
+// UI-specific schema for displaying invoices in the latest invoices component
+export const LatestInvoiceDisplaySchema = z.object({
+  id: z.string(),
+  customer: z.object({
+    name: z.string(),
+    email: z.string().email()
+  }),
+  amount: z.number(),
+  formattedAmount: z.string(),
+  date: z.date(),
+  formattedDate: z.string(),
+  status: InvoiceStatusSchema,
+  statusColor: z.string()
+});
+
 export type InvoiceFieldShape = z.infer<typeof InvoiceFieldShapeSchema>;
 export type InvoiceFormShape = z.infer<typeof InvoiceFormShapeSchema>;
+export type LatestInvoiceDisplay = z.infer<typeof LatestInvoiceDisplaySchema>;

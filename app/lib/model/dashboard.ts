@@ -1,8 +1,10 @@
 //@/lib/model/dashboard.ts
-import { OperationResult } from "@/lib/data/schema/base";
+
+import type { InvoiceWithCustomer } from "@/lib/data/schema/invoice";
+import type { RevenueMetrics } from "@/lib/data/schema/revenue";
 import { CustomerModel } from "@/lib/model/customer";
 import { InvoiceModel } from "@/lib/model/invoice";
-import type { InvoiceWithCustomer } from "@/lib/data/schema/invoice";
+import { RevenueModel } from "@/lib/model/revenue";
 
 // Type definitions for the data we'll be returning
 type CardData = {
@@ -10,11 +12,6 @@ type CardData = {
   numberOfInvoices: number;
   totalPaidInvoices: string;
   totalPendingInvoices: string;
-};
-
-type RevenueData = {
-  month: string;
-  revenue: number;
 };
 
 export class DashboardModel {
@@ -46,7 +43,7 @@ export class DashboardModel {
 
   static async getLatestInvoices(): Promise<InvoiceWithCustomer[]> {
     try {
-      const result = await InvoiceModel.findLatest(5);
+      const result = await InvoiceModel.getLatestWithCustomers(5);
 
       if (result.status !== "success" || !result.data) {
         console.error("Error fetching latest invoices:", result.message);
@@ -60,9 +57,9 @@ export class DashboardModel {
     }
   }
 
-  static async getRevenue(): Promise<RevenueData[]> {
+  static async getRevenue(): Promise<RevenueMetrics[]> {
     try {
-      const result = await InvoiceModel.getRevenueByMonth();
+      const result = await RevenueModel.getMonthlyMetrics(12);
 
       if (result.status !== "success" || !result.data) {
         throw new Error(result.message || "Failed to get revenue data");
@@ -73,22 +70,24 @@ export class DashboardModel {
       console.error("Error fetching revenue data:", error);
       // Return placeholder data if the query fails
       const months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
+        new Date("Jan"),
+        new Date("Feb"),
+        new Date("Mar"),
+        new Date("Apr"),
+        new Date("May"),
+        new Date("Jun"),
+        new Date("Jul"),
+        new Date("Aug"),
+        new Date("Sep"),
+        new Date("Oct"),
+        new Date("Nov"),
+        new Date("Dec"),
       ];
       return months.map((month) => ({
         month,
         revenue: Math.floor(Math.random() * 5000) + 1000,
+        expenses: 0,
+        profit: 0,
       }));
     }
   }

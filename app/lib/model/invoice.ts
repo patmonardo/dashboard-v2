@@ -1,7 +1,5 @@
-//@/lib/model/invoice.ts
 import { prisma } from "@/lib/data/client";
 import type { OperationResult } from "@/lib/data/schema/base";
-import type { Customer } from "@/lib/data/schema/customer";
 import {
   InvoiceShapeSchema,
   CreateInvoiceSchema,
@@ -12,10 +10,8 @@ import type {
   InvoiceShape,
   CreateInvoice,
   UpdateInvoice,
-} from "@/lib/data/schema/invoice";
-import {
-  type InvoiceWithCustomer,
-  InvoiceWithCustomerSchema,
+  InvoiceWithCustomer,
+  InvoiceStatus,
 } from "@/lib/data/schema/invoice";
 import { BaseModel } from "./base";
 
@@ -33,7 +29,11 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
     super(InvoiceShapeSchema, shape);
   }
 
-  static async create(data: CreateInvoice): Promise<OperationResult<Invoice>> {
+  // ===== CORE CRUD OPERATIONS =====
+
+  static async create(
+    data: CreateInvoice
+  ): Promise<OperationResult<InvoiceWithCustomer>> {
     try {
       const validated = CreateInvoiceSchema.safeParse(data);
       if (!validated.success) {
@@ -47,17 +47,15 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
         data: {
           id: crypto.randomUUID(),
           ...validated.data,
-          date: data.date ?? new Date(), // Use provided date or current date
-          createdAt: new Date(), // Always set to current time
-          updatedAt: new Date(), // Always set to current time
+          date: data.date ?? new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
-        include: {
-          customer: true,
-        },
+        include: { customer: true },
       });
 
       return {
-        data: invoice as Invoice & { customer: Customer },
+        data: invoice as InvoiceWithCustomer,
         status: "success",
         message: "Invoice created",
       };
@@ -74,7 +72,7 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
   static async update(
     id: string,
     data: UpdateInvoice
-  ): Promise<OperationResult<Invoice>> {
+  ): Promise<OperationResult<InvoiceWithCustomer>> {
     try {
       const validated = UpdateInvoiceSchema.safeParse(data);
       if (!validated.success) {
@@ -84,19 +82,18 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
           message: "Missing Fields. Failed to Update Invoice.",
         };
       }
+
       const invoice = await prisma.invoice.update({
         where: { id },
         data: {
           ...validated.data,
           updatedAt: new Date(),
         },
-        include: {
-          customer: true,
-        },
+        include: { customer: true },
       });
 
       return {
-        data: invoice as Invoice & { customer: Customer },
+        data: invoice as InvoiceWithCustomer,
         status: "success",
         message: "Invoice updated successfully",
       };
@@ -109,15 +106,38 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
     }
   }
 
+  static async delete(
+    id: string
+  ): Promise<OperationResult<InvoiceWithCustomer>> {
+    try {
+      const invoice = await prisma.invoice.delete({
+        where: { id },
+        include: { customer: true },
+      });
+
+      return {
+        data: invoice as InvoiceWithCustomer,
+        status: "success",
+        message: "Invoice deleted successfully",
+      };
+    } catch (error) {
+      return {
+        data: null,
+        status: "error",
+        message: "Failed to delete invoice",
+      };
+    }
+  }
+
+  // ===== QUERY OPERATIONS =====
+
   static async findById(
     id: string
-  ): Promise<OperationResult<Invoice & { customer: Customer }>> {
+  ): Promise<OperationResult<InvoiceWithCustomer>> {
     try {
       const invoice = await prisma.invoice.findUnique({
         where: { id },
-        include: {
-          customer: true,
-        },
+        include: { customer: true },
       });
 
       if (!invoice) {
@@ -129,7 +149,7 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
       }
 
       return {
-        data: invoice as Invoice & { customer: Customer },
+        data: invoice as InvoiceWithCustomer,
         status: "success",
         message: "Invoice found",
       };
@@ -150,24 +170,20 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
     query?: string;
     page?: number;
     pageSize?: number;
-  }): Promise<OperationResult<InvoiceWithCustomer[]>> {
+  } = {}): Promise<OperationResult<InvoiceWithCustomer[]>> {
     try {
       const skip = (page - 1) * pageSize;
 
       const invoices = await prisma.invoice.findMany({
         skip,
         take: pageSize,
-        include: {
-          customer: true,
-        },
-        orderBy: {
-          date: "desc",
-        },
+        include: { customer: true },
+        orderBy: { date: "desc" },
       });
 
       return {
         status: "success",
-        data: invoices,
+        data: invoices as InvoiceWithCustomer[],
         message: "Invoices retrieved successfully",
       };
     } catch (error) {
@@ -180,185 +196,102 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
     }
   }
 
-  static async count() {
-    return await prisma.invoice.count();
-  }
-
-  // Update this method to use the proper InvoiceStatus type
-  static async getTotalByStatus(status: "PENDING" | "PAID"): Promise<number> {
+  static async count(): Promise<number> {
     try {
-      const result = await prisma.invoice.aggregate({
-        where: {
-          status,
-        },
-        _sum: {
-          amount: true,
-        },
-      });
-      return Number(result._sum.amount ?? 0);
+      return await prisma.invoice.count();
     } catch (error) {
-      console.error(`Error getting total for ${status} invoices:`, error);
-      return 0; // Return 0 as a safe fallback
+      console.error("Error counting invoices:", error);
+      return 0;
     }
   }
 
-  // Add these new methods needed by the dashboard
-  static async findLatest(
-    count: number = 5
+  // ===== DASHBOARD & REPORTING =====
+  static async getLatestWithCustomers(
+    limit = 5
   ): Promise<OperationResult<InvoiceWithCustomer[]>> {
     try {
       const invoices = await prisma.invoice.findMany({
-        take: count,
+        take: limit,
         orderBy: { date: "desc" },
-        include: {
-          customer: true,
-        },
+        include: { customer: true },
       });
 
       return {
-        status: "success",
         data: invoices as InvoiceWithCustomer[],
-        message: `Found ${invoices.length} latest invoices`,
+        status: "success",
+        message: "Latest invoices retrieved successfully",
       };
     } catch (error) {
       console.error("Error finding latest invoices:", error);
+      // Still provide placeholder data, but with status information
       return {
-        status: "error",
         data: null,
-        message: "Failed to fetch latest invoices",
+        status: "error",
+        message: "Using placeholder data - database error occurred",
       };
     }
   }
-  static async getRevenueByMonth(): Promise<
-    OperationResult<{ month: string; revenue: number }[]>
+
+  static async getInvoiceCountByStatus(): Promise<
+    OperationResult<Record<InvoiceStatus, number>>
   > {
-    /*
-     try {
-      // For PostgreSQL
-      const invoicesByMonth = await prisma.$queryRaw`
-      SELECT
-        to_char(date, 'Mon') as month,
-        CAST(SUM(amount) AS FLOAT) as revenue
-      FROM "Invoice"
-      WHERE date >= NOW() - INTERVAL '1 year'
-      GROUP BY month, EXTRACT(MONTH FROM date)
-      ORDER BY EXTRACT(MONTH FROM date)
-    `;
-
-      return {
-        status: "success",
-        data: invoicesByMonth as { month: string; revenue: number }[],
-        message: `Retrieved revenue data by month`,
-      };
-    } catch (error) {
-      console.error("Error getting revenue by month:", error);
-*/
-    // Return placeholder data if the query fails
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const placeholderData = months.map((month) => ({
-      month,
-      revenue: Math.floor(Math.random() * 5000) + 1000,
-    }));
-
-    return {
-      status: "success", // We return success with placeholder data
-      data: placeholderData,
-      message: "Using placeholder revenue data (query failed)",
-    };
-  }
-
-  // More flexible method that can handle different time periods
-  static async getRevenueByPeriod(
-    period: "day" | "week" | "month" | "year" = "month",
-    limit: number = 12
-  ): Promise<OperationResult<{ period: string; revenue: number }[]>> {
     try {
-      let formatString: string;
-      let intervalString: string;
+      // Define statuses array based on InvoiceStatus enum
+      const statuses = [
+        "PAID",
+        "PENDING",
+        "OVERDUE",
+        "DRAFT",
+      ] as InvoiceStatus[];
 
-      switch (period) {
-        case "day":
-          formatString = "YYYY-MM-DD";
-          intervalString = `${limit} days`;
-          break;
-        case "week":
-          formatString = "YYYY-WW";
-          intervalString = `${limit} weeks`;
-          break;
-        case "month":
-          formatString = "Mon YYYY";
-          intervalString = `${limit} months`;
-          break;
-        case "year":
-          formatString = "YYYY";
-          intervalString = `${limit} years`;
-          break;
-        default:
-          formatString = "Mon YYYY";
-          intervalString = `${limit} months`;
-      }
-
-      const revenue = await prisma.$queryRaw`
-      SELECT
-        to_char(date, ${formatString}) as period,
-        CAST(SUM(amount) AS FLOAT) as revenue
-      FROM "Invoice"
-      WHERE date >= NOW() - INTERVAL ${intervalString}
-      GROUP BY period
-      ORDER BY MIN(date)
-    `;
-
-      return {
-        status: "success",
-        data: revenue as { period: string; revenue: number }[],
-        message: `Retrieved revenue by ${period} for last ${limit} periods`,
+      const counts: Record<InvoiceStatus, number> = {
+        PAID: 0,
+        PENDING: 0,
+        OVERDUE: 0,
+        DRAFT: 0,
       };
-    } catch (error) {
-      console.error(`Error getting revenue by ${period}:`, error);
 
-      // Generate placeholder data based on period and limit
-      const placeholderData = Array.from({ length: limit }, (_, i) => ({
-        period: `Period ${i + 1}`,
-        revenue: Math.floor(Math.random() * 5000) + 1000,
-      }));
-
-      return {
-        status: "success",
-        data: placeholderData,
-        message: `Using placeholder ${period}ly revenue data`,
-      };
-    }
-  }
-
-  static async delete(id: string): Promise<OperationResult<Invoice>> {
-    try {
-      const invoice = await prisma.invoice.delete({
-        where: { id },
-      });
+      // Get counts for each status
+      await Promise.all(
+        statuses.map(async (status) => {
+          counts[status] = await prisma.invoice.count({
+            where: { status },
+          });
+        })
+      );
 
       return {
-        data: invoice as Invoice,
+        data: counts,
         status: "success",
-        message: "Customer deleted successfully",
+        message: "Invoice counts by status retrieved successfully",
       };
     } catch (error) {
       return {
         data: null,
         status: "error",
-        message: "Failed to delete Customer",
+        message: "Error counting invoices by status:",
+      };
+    }
+  }
+
+  static async getTotalByStatus(
+    status: InvoiceStatus
+  ): Promise<OperationResult<number>> {
+    try {
+      const result = await prisma.invoice.aggregate({
+        where: { status },
+        _sum: { amount: true },
+      });
+      return {
+        data: Number(result._sum.amount ?? 0),
+        status: "success",
+        message: `Total for ${status} invoices retrieved successfully`,
+      };
+    } catch (error) {
+      return {
+        data: null,
+        status: "error",
+        message: "Error getting total for ${status} invoices:`, error",
       };
     }
   }

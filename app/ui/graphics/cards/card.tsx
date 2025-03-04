@@ -55,6 +55,20 @@ export function Card({ title, value, type = 'default', icon, className = '' }: C
   );
 }
 
+// Define a generic ContainerCard component for flexible content
+export interface ContainerCardProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function ContainerCard({ children, className = '' }: ContainerCardProps) {
+  return (
+    <div className={`rounded-xl bg-white p-6 shadow-sm ${className}`}>
+      {children}
+    </div>
+  );
+}
+
 // Export a specialized StatCard for statistics that takes the same props
 export function StatCard(props: CardProps) {
   return <Card {...props} />;

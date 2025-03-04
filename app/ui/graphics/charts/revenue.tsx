@@ -1,57 +1,75 @@
-//@/ui/graphics/charts/revenue.tsx
 'use client';
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
+// Update this import
+import { RevenueChartDisplay } from '@/ui/graphics/schema/revenue';
+import { ContainerCard } from '@/ui/graphics/cards/card';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
+} from 'recharts';
 
-type RevenueChartProps = {
-  revenue: Array<{
-    month: string;
-    revenue: number;
-  }>;
-};
-
-export function RevenueChart({ revenue }: RevenueChartProps) {
+export function RevenueChart({ data }: { data: RevenueChartDisplay }) {
   return (
-    <div className="rounded-xl bg-white p-6 shadow-sm h-full">
-      <h3 className="mb-4 text-sm font-medium">Recent Revenue</h3>
-      <div className="h-80">
+    <ContainerCard>
+      <h3 className="text-lg font-medium">Revenue Over Time</h3>
+
+      <div className="mt-4 h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={revenue}
+            data={data.data}
             margin={{
-              top: 0,
-              right: 0,
-              left: 0,
-              bottom: 0,
+              top: 5,
+              right: 10,
+              left: 10,
+              bottom: 5,
             }}
           >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis
-              dataKey="month"
-              stroke="#888888"
-              fontSize={12}
+              dataKey="date"
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              stroke="#888888"
-              fontSize={12}
               tickLine={false}
               axisLine={false}
               tickFormatter={(value) => `$${value}`}
             />
             <Tooltip
               formatter={(value) => [`$${value}`, 'Revenue']}
-              cursor={{ fill: 'rgba(236, 237, 238, 0.4)' }}
+              labelFormatter={(label) => `Date: ${label}`}
             />
             <Bar
-              dataKey="revenue"
-              fill="#0ea5e9"
+              dataKey="amount"
+              fill="#0EA5E9"
               radius={[4, 4, 0, 0]}
-              barSize={40}
+              name="Revenue"
             />
           </BarChart>
         </ResponsiveContainer>
       </div>
-    </div>
+
+      <div className="mt-4">
+        <div className="flex items-center justify-between text-sm">
+          <div>
+            <p className="text-gray-500">Total Revenue</p>
+            <p className="text-xl font-medium">${data.totalRevenue.toLocaleString()}</p>
+          </div>
+          {data.growthRate !== undefined && (
+            <div>
+              <p className="text-gray-500">Growth</p>
+              <p className={`text-xl font-medium ${data.growthRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {data.growthRate >= 0 ? '+' : ''}{data.growthRate.toFixed(1)}%
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </ContainerCard>
   );
 }

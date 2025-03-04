@@ -1,43 +1,49 @@
-//#/(controller)/dashboard/page.tsx
-import { Suspense } from "react";
-import { DashboardModel } from "@/lib/model/dashboard";
-import { DashboardView } from "@/ui/view/dashboard";
-import { StatCard } from "@/ui/graphics/cards/card";
-import { LatestInvoicesWrapper } from "@/(controller)/inner/invoice";
-import { RevenueChartWrapper } from "@/(controller)/inner/revenue";
-import { RevenueChartSkeleton } from "@/(controller)/outer/skeletons";
-import { LatestInvoicesSkeleton } from "@/(controller)/outer/skeletons";
+import { Suspense } from 'react';
+import { Card } from '@/ui/graphics/cards/card';
+import { RevenueChartController } from '@/(controller)/inner/revenue';
+import { LatestInvoicesController } from '@/(controller)/inner/invoice';
 
-export default async function Page() {
-  // Fetch data using the model
-  const cardData = await DashboardModel.getCardData();
+// Loading placeholders
+function CardSkeleton() {
+  return <div className="w-full h-[123px] rounded-xl bg-gray-100 animate-pulse" />;
+}
 
-  // Format data using the view
-  const formattedCardData = DashboardView.formatCardData(cardData);
+function ChartSkeleton() {
+  return <div className="w-full h-[400px] rounded-xl bg-gray-100 animate-pulse" />;
+}
 
+function InvoicesSkeleton() {
+  return <div className="w-full h-[400px] rounded-xl bg-gray-100 animate-pulse" />;
+}
+
+export default function DashboardPage() {
   return (
-    <main className="bg-white">
-      <h1 className="mb-4 text-xl md:text-2xl font-semibold">Dashboard</h1>
+    <main className="p-6">
+      <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>
 
-      {/* Stats Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard {...formattedCardData.collected} />
-        <StatCard {...formattedCardData.pending} />
-        <StatCard {...formattedCardData.invoices} />
-        <StatCard {...formattedCardData.customers} />
+      {/* Cards row */}
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-4 mb-6">
+        <Suspense fallback={<CardSkeleton />}>
+          <Card title="Total Customers" value="1,429" type="customers" />
+        </Suspense>
+        <Suspense fallback={<CardSkeleton />}>
+          <Card title="Pending" value="$20,550" type="pending" />
+        </Suspense>
+        <Suspense fallback={<CardSkeleton />}>
+          <Card title="Total Invoices" value="297" type="invoices" />
+        </Suspense>
+        <Suspense fallback={<CardSkeleton />}>
+          <Card title="Total Revenue" value="$120,357" type="collected" />
+        </Suspense>
       </div>
 
-      {/* Revenue Chart and Latest Invoices */}
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-8">
-        <Suspense fallback={<RevenueChartSkeleton />}>
-          <div className="md:col-span-5">
-            <RevenueChartWrapper />
-          </div>
+      {/* Charts and tables */}
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 mb-6">
+        <Suspense fallback={<ChartSkeleton />}>
+          <RevenueChartController />
         </Suspense>
-        <Suspense fallback={<LatestInvoicesSkeleton />}>
-          <div className="md:col-span-3">
-            <LatestInvoicesWrapper />
-          </div>
+        <Suspense fallback={<InvoicesSkeleton />}>
+          <LatestInvoicesController />
         </Suspense>
       </div>
     </main>

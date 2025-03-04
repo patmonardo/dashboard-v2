@@ -1,23 +1,17 @@
-//@/ui/graphics/cards/invoice.tsx
-import { InvoiceWithCustomer } from '@/lib/data/schema/invoice';
+import { LatestInvoiceDisplay } from '@/ui/graphics/schema/invoice';
+import { ContainerCard } from '@/ui/graphics/cards/card';
 
 interface LatestInvoicesCardProps {
-  invoices: Array<{
-    id: string;
-    customer: {
-      name: string;
-      email: string;
-    };
-    formattedAmount: string;
-    formattedDate: string;
-    statusColor: string;
-  }>;
+  invoices: LatestInvoiceDisplay[];
   title?: string;
 }
 
-export function LatestInvoicesCard({ invoices, title = "Latest Invoices" }: LatestInvoicesCardProps) {
+export function LatestInvoicesCard({
+  invoices,
+  title = "Latest Invoices"
+}: LatestInvoicesCardProps) {
   return (
-    <div className="rounded-xl bg-white p-6 shadow-sm h-full">
+    <ContainerCard className="h-full">
       <h3 className="font-medium text-gray-900 mb-4">{title}</h3>
       <div className="flex flex-col space-y-4">
         {invoices.map((invoice) => (
@@ -41,6 +35,6 @@ export function LatestInvoicesCard({ invoices, title = "Latest Invoices" }: Late
           </div>
         ))}
       </div>
-    </div>
+    </ContainerCard>
   );
 }

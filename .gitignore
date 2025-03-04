@@ -38,7 +38,7 @@ next-env.d.ts
 
 # Prisma
 /prisma/*.db
-/prisma/migrations/*_init/
+/prisma/migrations/
 
 # Reference material
 nextjs-dashboard/

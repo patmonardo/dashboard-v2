@@ -1,15 +1,19 @@
-//lib/data/schema/revenue.ts
+// app/lib/data/schema/revenue.ts
 import { z } from 'zod'
 import { BaseSchema, BaseStateSchema } from './base'
 
-export const RevenueSchema = z.object({
+// Time intervals for reporting (kept here as it's domain knowledge)
+export const TimeIntervalSchema = z.enum(['day', 'week', 'month', 'quarter', 'year'])
+
+// Base Revenue Schema for database records
+export const RevenueSchema = BaseSchema.extend({
   id: z.string().uuid(),
   month: z.date(),
-  revenue: z.number(), // Use z.number() instead of Decimal
-  expenses: z.number().optional().default(0) // Use z.number() instead of Decimal
+  revenue: z.number(),
+  expenses: z.number().optional().default(0)
 })
 
-// State Schema - Runtime state and validation errors
+// State Schema for runtime state and validation
 export const RevenueStateSchema = BaseStateSchema.extend({
   errors: z.object({
     month: z.array(z.string()).optional(),
@@ -25,12 +29,24 @@ export const RevenueShapeSchema = z.object({
 })
 
 export const CreateRevenueSchema = RevenueSchema.omit({
-  id: true
+  id: true,
+  createdAt: true,
+  updatedAt: true
 })
 
 export const UpdateRevenueSchema = RevenueSchema.omit({
-  id: true
+  id: true,
+  createdAt: true,
+  updatedAt: true
 }).partial()
+
+// Type for revenue metrics
+export const RevenueMetricsSchema = z.object({
+  month: z.date(),
+  revenue: z.number(),
+  expenses: z.number(),
+  profit: z.number(),
+});
 
 // Type exports
 export type Revenue = z.infer<typeof RevenueSchema>
@@ -38,3 +54,5 @@ export type RevenueState = z.infer<typeof RevenueStateSchema>
 export type RevenueShape = z.infer<typeof RevenueShapeSchema>
 export type CreateRevenue = z.infer<typeof CreateRevenueSchema>
 export type UpdateRevenue = z.infer<typeof UpdateRevenueSchema>
+export type TimeInterval = z.infer<typeof TimeIntervalSchema>
+export type RevenueMetrics = z.infer<typeof RevenueMetricsSchema>

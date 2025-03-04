@@ -183,21 +183,6 @@ a5e962b7-784a-43d1-8b0b-06000249e075	2025-12-01 08:00:00	4800	0
 COPY public."User" (id, name, email, password, "createdAt", "updatedAt") FROM stdin;
 \.
 
-
---
--- Data for Name: _prisma_migrations; Type: TABLE DATA; Schema: public; Owner: pat
---
-
-COPY public._prisma_migrations (id, checksum, finished_at, migration_name, logs, rolled_back_at, started_at, applied_steps_count) FROM stdin;
-00d328b8-981e-4ee6-abd3-ee658f6a1619	16418f94e374fa668efb2422e1bb8d422354ef7f75c845bb720e2a701a84198d	2025-02-25 17:09:51.548293-08	20210304121245_	\N	\N	2025-02-25 17:09:51.52965-08	1
-499e627b-b28f-4c86-9118-351795848c09	dd630c5ecd0fa5dbed62e040e84bef10be9e378b6dbc4e17561df145c777f93b	2025-02-25 17:09:51.55712-08	20241206100315_prisma-update	\N	\N	2025-02-25 17:09:51.549549-08	1
-e5f8a142-0b66-4dc0-a05f-79ede2f4c621	aab1bdda130cb38c81723ccccc9e28d8e7fe2fe28b877df55e3e749c5bf73ad7	2025-02-25 17:09:51.604057-08	20250219184747_	\N	\N	2025-02-25 17:09:51.558742-08	1
-c5149562-cab8-4d81-8baa-745d57034945	bb44d7c11005d17fdcc70ed50ea7c902724be39cc8d2394cdd60f113f338fa1e	2025-02-25 17:09:51.634481-08	20250220014319_init	\N	\N	2025-02-25 17:09:51.605488-08	1
-bd772ea8-f09f-4187-836a-3360eae067ae	25eccb96a7ca6810ef9ad91fc383f6c3e4d1f1e53d308882e356572fe6ba6155	2025-02-25 17:09:51.640282-08	20250220030831_removed_unique_constraint_on_revenue_month	\N	\N	2025-02-25 17:09:51.635908-08	1
-97f5ec73-edbd-4041-b77b-54092fbb918c	b21752c8b44a1d986d3f818bb927726177d359ea866244426c8bce2e396198a2	2025-02-25 17:09:51.647228-08	20250225230956_first	\N	\N	2025-02-25 17:09:51.641668-08	1
-\.
-
-
 --
 -- Name: Customer Customer_pkey; Type: CONSTRAINT; Schema: public; Owner: pat
 --
