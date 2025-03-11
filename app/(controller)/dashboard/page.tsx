@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { Card } from '@/ui/graphics/cards/card';
-import { RevenueChartController } from '@/(controller)/inner/revenue';
-import { LatestInvoicesController } from '@/(controller)/inner/invoice';
+import { RevenueChart } from '@/(controller)/outer/chart';
+import { LatestInvoices } from '@/(controller)/outer/table';
 
 // Loading placeholders
 function CardSkeleton() {
@@ -40,10 +40,10 @@ export default function DashboardPage() {
       {/* Charts and tables */}
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 mb-6">
         <Suspense fallback={<ChartSkeleton />}>
-          <RevenueChartController />
+          <RevenueChart />
         </Suspense>
         <Suspense fallback={<InvoicesSkeleton />}>
-          <LatestInvoicesController />
+          <LatestInvoices />
         </Suspense>
       </div>
     </main>

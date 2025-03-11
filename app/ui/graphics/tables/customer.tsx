@@ -1,38 +1,15 @@
-//@/(controller)/customers/table.tsx
 import Image from "next/image";
 import { Customer } from "@/lib/data/schema/customer";
-import { CustomerModel } from "@/lib/model/customer";
-import UpdateCustomerButton from "./buttons/update";
-import DeleteCustomerButton from "./buttons/delete";
+import UpdateCustomerButton from "@/(controller)/customers/buttons/update";
+import DeleteCustomerButton from "@/(controller)/customers/buttons/delete";
 
 const DEFAULT_IMAGE = '/icons/favicon.ico';
 
-export async function totalPages(pageSize = 10): Promise<number> {
-  const totalCustomers = await CustomerModel.count();
-  return Math.ceil(totalCustomers / pageSize);
+interface CustomerTableProps {
+  customers: Customer[];
 }
 
-export default async function CustomersTable({
-  query,
-  currentPage,
-}: {
-  query: string;
-  currentPage: number;
-}) {
-  let customers: Customer[] = [];
-
-  // Fetch customers with pagination and search
-  const pageSize = 10; // Number of customers per page
-  const result = await CustomerModel.findAll({
-    query,
-    page: currentPage,
-    pageSize,
-  });
-
-  if (result.status === "success") {
-    customers = result.data;
-  }
-
+export default function CustomerTable({ customers }: CustomerTableProps) {
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">

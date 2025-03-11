@@ -23,7 +23,4 @@ export abstract class FormView<T extends FormShape> {
     }
   }
 
-  abstract update(): void
-  abstract handleSubmit(): Promise<void>
-  abstract handleCancel(): void
 }
