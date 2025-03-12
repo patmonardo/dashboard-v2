@@ -1,12 +1,11 @@
 import Image from "next/image";
-import Link from "next/link";
 import DeleteInvoiceButton from "@/(controller)/invoices/buttons/delete";
 import UpdateInvoiceButton from "@/(controller)/invoices/buttons/update";
 import InvoiceStatus from "@/(controller)/invoices/status";
 import { formatCurrency, formatDateToLocal } from "@/lib/data/formatting";
 import { InvoiceWithCustomer } from "@/lib/data/schema/invoice";
 
-const DEFAULT_IMAGE = '/icons/favicon.ico';
+const DEFAULT_IMAGE = "/icons/favicon.ico";
 
 interface InvoiceTableProps {
   invoices: InvoiceWithCustomer[];
@@ -50,13 +49,8 @@ export default function InvoiceTable({ invoices }: InvoiceTableProps) {
                       </p>
                       <p>{formatDateToLocal(invoice.date)}</p>
                     </div>
-                    <div className="flex justify-end gap-2">
-                      <Link
-                        href={`/invoices/${invoice.id}/edit`}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        Edit
-                      </Link>
+                    <div className="flex justify-end gap-3">
+                      <UpdateInvoiceButton id={invoice.id} />
                       <DeleteInvoiceButton id={invoice.id} />
                     </div>
                   </div>
@@ -123,15 +117,10 @@ export default function InvoiceTable({ invoices }: InvoiceTableProps) {
                       <InvoiceStatus status={invoice.status} />
                     </td>
                     <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                      <div className="flex justify-end gap-3">
-                        <Link
-                          href={`/invoices/${invoice.id}/edit`}
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          Edit
-                        </Link>
-                        <DeleteInvoiceButton id={invoice.id} />
-                      </div>
+                    <div className="flex justify-end gap-3">
+                      <UpdateInvoiceButton id={invoice.id} />
+                      <DeleteInvoiceButton id={invoice.id} />
+                    </div>
                     </td>
                   </tr>
                 ))

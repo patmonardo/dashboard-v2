@@ -1,4 +1,4 @@
-//@/(controller)/outer/search.tsx
+//@/ui/graphics/search/search.tsx
 "use client";
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';

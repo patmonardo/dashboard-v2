@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import Pagination from "@/(controller)/outer/pagination";
 import { InvoiceController } from "@/(controller)/inner/invoice";
 
 export default async function Page(props: {
@@ -10,17 +9,14 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || '';
-  const currentPage = Number(searchParams?.page) || 1;
-  const totalPages = await InvoiceController.totalPages();
-
+  const page = Number(searchParams?.page) || 1;
+  console.log("Query: ", query);
   return (
     <main className="max-w-7xl mx-auto p-4">
-      <Suspense key={query + currentPage} fallback={<div>Loading...</div>}>
-        {await InvoiceController.list(query, currentPage)}
+      <Suspense key={query + page} fallback={<div>Loading...</div>}>
+        {await InvoiceController.list(query, page)}
       </Suspense>
-      <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={totalPages} />
-      </div>
+
     </main>
   );
 }

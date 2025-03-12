@@ -1,5 +1,5 @@
 //@/(controller)/layout.tsx
-import SideNav from '@/(controller)/outer/sidenav';
+import SideNav from '@/ui/graphics/links/sidenav';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

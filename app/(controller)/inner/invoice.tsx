@@ -1,15 +1,16 @@
+import type { ReactNode } from "react";
 import { notFound, redirect } from "next/navigation";
-import Breadcrumbs from "@/(controller)/outer/breadcrumbs";
 import Link from "next/link";
-import Search from "@/(controller)/outer/search";
+import Breadcrumbs from "@/ui/graphics/links/breadcrumbs";
+import Pagination from "@/ui/graphics/links/pagination";
+import Search from "@/ui/graphics/search/search";
 import type { FormHandler } from "@/ui/graphics/schema/form";
 import InvoiceTable from "@/ui/graphics/tables/invoice";
 import { InvoiceModel } from "@/lib/model/invoice";
 import { InvoiceView } from "@/ui/view/invoice";
-import createInvoiceAction from "../invoices/actions/create";
-import updateInvoiceAction from "../invoices/actions/update";
-import cancelInvoiceAction from "../invoices/actions/cancel";
-import type { ReactNode } from "react";
+import createInvoiceAction from "@/(controller)/invoices/actions/create";
+import updateInvoiceAction from "@/(controller)/invoices/actions/update";
+import cancelInvoiceAction from "@/(controller)/invoices/actions/cancel";
 
 // Single controller class for invoice operations
 export class InvoiceController {
@@ -101,6 +102,7 @@ export class InvoiceController {
       redirect("/customers");
     }
   }
+
   /**
    * Lists invoices with search and pagination
    * @param query Search query
@@ -137,6 +139,9 @@ export class InvoiceController {
           <Search placeholder="Search invoices..." />
         </div>
         <InvoiceTable invoices={result.data} />
+        <div className="mt-5 flex w-full justify-center">
+          <Pagination totalPages={await this.totalPages()} />
+        </div>
       </>
     );
   }
@@ -161,6 +166,6 @@ export class InvoiceController {
       console.error("Error displaying latest invoices:", result.message);
       return null;
     }
-    return (<>{display.data}</>);
+    return <>{display.data}</>;
   }
 }

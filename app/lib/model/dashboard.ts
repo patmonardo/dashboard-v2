@@ -1,5 +1,4 @@
 //@/lib/model/dashboard.ts
-
 import type { InvoiceWithCustomer } from "@/lib/data/schema/invoice";
 import type { RevenueMetrics } from "@/lib/data/schema/revenue";
 import { CustomerModel } from "@/lib/model/customer";
@@ -15,20 +14,33 @@ type CardData = {
 };
 
 export class DashboardModel {
+  // Method to fetch card data
   static async getCardData(): Promise<CardData> {
     try {
       const numberOfCustomers = await CustomerModel.count();
       const numberOfInvoices = await InvoiceModel.count();
       const totalPaidInvoices = await InvoiceModel.getTotalByStatus("PAID");
-      const totalPendingInvoices = await InvoiceModel.getTotalByStatus(
-        "PENDING"
-      );
+      const totalPendingInvoices = await InvoiceModel.getTotalByStatus("PENDING");
 
+      if (totalPaidInvoices.status !== "success" || !totalPaidInvoices.data) {
+        throw new Error(totalPaidInvoices.message || "Failed to get paid invoices");
+      }
+      if (totalPendingInvoices.status !== "success" || !totalPendingInvoices.data) {
+        throw new Error(totalPendingInvoices.message || "Failed to get pending invoices");
+      }
+      const totalPaidInvoicesString = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(totalPaidInvoices.data);
+      const totalPendingInvoicesString = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(totalPendingInvoices.data);
       return {
         numberOfCustomers,
         numberOfInvoices,
-        totalPaidInvoices: totalPaidInvoices.toString(),
-        totalPendingInvoices: totalPendingInvoices.toString(),
+        totalPaidInvoices: totalPaidInvoicesString,
+        totalPendingInvoices: totalPendingInvoicesString,
       };
     } catch (error) {
       console.error("Error fetching card data:", error);

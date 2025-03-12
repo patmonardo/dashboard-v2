@@ -1,15 +1,16 @@
+import type { ReactNode } from "react";
 import { notFound, redirect } from "next/navigation";
-import Breadcrumbs from "@/(controller)/outer/breadcrumbs";
 import Link from "next/link";
-import Search from "@/(controller)/outer/search";
+import Breadcrumbs from "@/ui/graphics/links/breadcrumbs";
+import Pagination from "@/ui/graphics/links/pagination";
+import Search from "@/ui/graphics/search/search";
 import type { FormHandler } from "@/ui/graphics/schema/form";
 import CustomerTable from "@/ui/graphics/tables/customer";
 import { CustomerModel } from "@/lib/model/customer";
 import { CustomerView } from "@/ui/view/customer";
-import createCustomerAction from "../customers/actions/create";
-import updateCustomerAction from "../customers/actions/update";
-import cancelCustomerAction from "../customers/actions/cancel";
-import type { ReactNode } from "react";
+import createCustomerAction from "@/(controller)/customers/actions/create";
+import updateCustomerAction from "@/(controller)/customers/actions/update";
+import cancelCustomerAction from "@/(controller)/customers/actions/cancel";
 
 // Single controller class for customer operations
 export class CustomerController {
@@ -140,6 +141,9 @@ export class CustomerController {
           <Search placeholder="Search customers..." />
         </div>
         <CustomerTable customers={result.data} />
+        <div className="mt-5 flex w-full justify-center">
+          <Pagination totalPages={await this.totalPages()} />
+        </div>
       </>
     );
   }

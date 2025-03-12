@@ -1,7 +1,7 @@
-//@/(controller)/outer/sidenav.tsx
+//@/ui/graphics/links/sidenav.tsx
 import Link from "next/link";
-import NavLinks from "@/(controller)/outer/navlinks";
-import { AcmeLogo } from "@/(controller)/outer/logo";
+import NavLinks from "@/ui/graphics/links/navlinks";
+import { AcmeLogo } from "@/ui/graphics/styles/logo";
 import { PowerIcon } from "@heroicons/react/24/outline";
 
 export default function SideNav() {

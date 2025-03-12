@@ -162,23 +162,54 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
     }
   }
 
-  static async findAll({
-    query = "",
-    page = 1,
-    pageSize = 10,
-  }: {
-    query?: string;
-    page?: number;
-    pageSize?: number;
-  } = {}): Promise<OperationResult<InvoiceWithCustomer[]>> {
+  static async findAll(
+    options: {
+      query?: string;
+      page?: number;
+      pageSize?: number;
+    } = {}
+  ): Promise<OperationResult<InvoiceWithCustomer[]>> {
     try {
-      const skip = (page - 1) * pageSize;
+      const { page = 1, pageSize = 10, query = "" } = options;
+      const offset = (page - 1) * pageSize;
+
+      // Build where clause based on field types
+      let where = {};
+
+      if (query) {
+        // Array to build our OR conditions
+        const orConditions = [];
+
+        // Customer name and email - these support 'contains'
+        orConditions.push(
+          { customer: { name: { contains: query } } },
+          { customer: { email: { contains: query } } }
+        );
+
+        // Status - enum field requires exact match
+        // Only add if query matches a valid status
+        const uppercaseQuery = query.toUpperCase();
+        const validStatuses = ["PAID", "PENDING", "OVERDUE", "DRAFT"];
+        if (validStatuses.includes(uppercaseQuery)) {
+          orConditions.push({ status: uppercaseQuery });
+        }
+
+        // Amount - numeric field requires numeric comparison
+        // Only add if query is a valid number
+        const numericQuery = parseFloat(query);
+        if (!isNaN(numericQuery)) {
+          orConditions.push({ amount: { equals: numericQuery } });
+        }
+
+        where = { OR: orConditions };
+      }
 
       const invoices = await prisma.invoice.findMany({
-        skip,
+        where,
+        skip: offset,
         take: pageSize,
-        include: { customer: true },
         orderBy: { date: "desc" },
+        include: { customer: true },
       });
 
       return {
@@ -188,10 +219,11 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
       };
     } catch (error) {
       console.error("Error fetching invoices:", error);
+
       return {
         status: "error",
         data: null,
-        message: "Failed to fetch invoices",
+        message: `Failed to retrieve invoices: ${error}`,
       };
     }
   }
@@ -282,16 +314,25 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
         where: { status },
         _sum: { amount: true },
       });
+
+      // Better handling of the Decimal value
+      let total = 0;
+      if (result._sum.amount) {
+        // Convert Prisma Decimal to JavaScript number
+        total = parseFloat(result._sum.amount.toString());
+      }
+
       return {
-        data: Number(result._sum.amount ?? 0),
+        data: total,
         status: "success",
         message: `Total for ${status} invoices retrieved successfully`,
       };
     } catch (error) {
+      console.error(`Error getting total for ${status} invoices:`, error);
       return {
-        data: null,
+        data: null, // Return 0 instead of null for consistency
         status: "error",
-        message: "Error getting total for ${status} invoices:`, error",
+        message: `Error getting total for ${status} invoices`
       };
     }
   }
