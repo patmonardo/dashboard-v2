@@ -63,10 +63,36 @@ export const FormShapeSchema = z.object({
   state: FormStateSchema,
 });
 
+/**
+ * FormFrame - Visual container and contextual elements surrounding a form
+ * Provides supplementary information and enhances the form's presentation
+ */
+export const FormFrameSchema = z.object({
+  main: z.union([z.string(), z.any()]).optional(),
+  sidebar: z.union([z.string(), z.any()]).optional(),
+  footer: z.union([z.string(), z.any()]).optional(),
+  header: z.union([z.string(), z.any()]).optional(),
+});
+
+/**
+ * FormRender - Complete schema for rendering a form with navigation and framing
+ * Combines form schema with contextual elements for a complete UI
+ */
+export const FormRenderSchema = z.object({
+  breadcrumbs: z.array(z.any()), // Will reference LinkSchema later
+  form: FormShapeSchema,
+  frame: FormFrameSchema.optional(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+});
+
+
 // Type exports
 export type FormMatter = z.infer<typeof FormMatterSchema>;
 export type FormMode = z.infer<typeof FormModeSchema>;
 export type FormContent = z.infer<typeof FormContentSchema>;
+export type FormFrame = z.infer<typeof FormFrameSchema>;
+export type FormRender = z.infer<typeof FormRenderSchema>;
 export type FormOptions = z.infer<typeof FormOptionSchema>;
 export type FormHandler = z.infer<typeof FormHandlerSchema>;
 export type FormField = z.infer<typeof FormFieldSchema>;

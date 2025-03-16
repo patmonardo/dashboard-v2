@@ -74,39 +74,11 @@ export class RevenueForm extends Form<RevenueFormShape> {
     });
   }
 
-  async create(): Promise<OperationResult<RevenueFormShape>> {
-    try {
-      const shape = await this.getFormShape("create");
-      return {
-        data: shape,
-        status: "success",
-        message: "Form created successfully",
-      };
-    } catch (error) {
-      console.error("Error creating revenue form:", error);
-      return {
-        data: null,
-        status: "error",
-        message: "Invalid form configuration",
-      };
-    }
+  async createForm(): Promise<RevenueFormShape> {
+    return await this.getFormShape("create");
   }
 
-  async edit(): Promise<OperationResult<RevenueFormShape>> {
-    try {
-      const shape = await this.getFormShape("edit");
-      return {
-        data: shape,
-        status: "success",
-        message: "Form loaded successfully",
-      };
-    } catch (error) {
-      console.error("Error creating revenue form:", error);
-      return {
-        data: null,
-        status: "error",
-        message: "Invalid revenue configuration",
-      };
-    }
+  async editForm(): Promise<RevenueFormShape> {
+    return await this.getFormShape("edit");
   }
 }

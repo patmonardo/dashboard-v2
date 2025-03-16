@@ -10,13 +10,11 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || '';
   const page = Number(searchParams?.page) || 1;
-  console.log("Query: ", query);
   return (
     <main className="max-w-7xl mx-auto p-4">
       <Suspense key={query + page} fallback={<div>Loading...</div>}>
-        {await InvoiceController.list(query, page)}
+        {await InvoiceController.listInvoices(query, page)}
       </Suspense>
-
     </main>
   );
 }

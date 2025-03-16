@@ -1,11 +1,10 @@
 //@/ui/view/invoice.ts
-import type { OperationResult } from "@/lib/data/schema/base";
+import { ReactNode } from "react";
+import { OperationResult } from "@/lib/data/schema/base";
 import { Invoice, InvoiceWithCustomer } from "@/lib/data/schema/invoice";
-import { InvoiceForm } from "@/ui/graphics/forms/invoice";
 import { InvoiceFormShape } from "@/ui/graphics/schema/invoice";
-import { formatCurrency } from "@/lib/data/formatting";
-import { LatestInvoiceDisplay } from "@/ui/graphics/schema/invoice";
-import { LatestInvoicesCard } from "@/ui/graphics/cards/invoice";
+import { InvoiceForm } from "@/ui/graphics/forms/invoice";
+import { InvoiceTable } from "@/ui/graphics/tables/invoice";
 import { FormView } from "./form";
 
 export class InvoiceView extends FormView<InvoiceFormShape> {
@@ -13,47 +12,50 @@ export class InvoiceView extends FormView<InvoiceFormShape> {
     super(new InvoiceForm(invoice));
   }
 
-  static async displayInvoices(
-    invoices: InvoiceWithCustomer[]
-  ): Promise<OperationResult<any>> {
-    // Status color mapping
-    const statusColors = {
-      PAID: "bg-green-500",
-      PENDING: "bg-yellow-500",
-      OVERDUE: "bg-red-500",
-      DRAFT: "bg-gray-500",
-    };
+  public async displayTable(
+    invoices: InvoiceWithCustomer[],
+    totalPages = 1
+  ): Promise<OperationResult<ReactNode>> {
+    // Create the specialized table
+    const table = new InvoiceTable(invoices);
 
-    // Transform to display format
-    const displayData: LatestInvoiceDisplay[] = invoices.map((invoice) => ({
-      id: invoice.id,
-      customer: {
-        name: invoice.customer.name,
-        email: invoice.customer.email,
-      },
-      amount: invoice.amount,
-      formattedAmount: formatCurrency(invoice.amount),
-      date: invoice.date,
-      formattedDate: formatInvoiceDate(invoice.date),
-      status: invoice.status,
-      statusColor: statusColors[invoice.status],
-    }));
+    // Set pagination in the shape
+    table.withTransformations((shape) => {
+      shape.state.totalPages = totalPages;
+      shape.state.page = 1; // Default to first page
+    });
 
-    // Render the invoices card
-    const card = LatestInvoicesCard({ invoices: displayData });
+    // Use parent implementation to render
     return {
       status: "success",
-      message: "Latest invoices display",
-      data: card,
+      data: await table.render(),
+      message: "Table rendered successfully",
     };
   }
-}
 
-// Helper for formatting dates
-function formatInvoiceDate(date: Date): string {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
+  public async displayLatest(
+    invoices: InvoiceWithCustomer[]
+  ): Promise<OperationResult<ReactNode>> {
+    // Create the table
+    const table = new InvoiceTable(invoices);
+
+    // Apply transformations to the shape - all in one transformation for clarity
+    table.withTransformations((shape) => {
+      // Layout changes
+      shape.layout.searchable = false;
+      shape.layout.paginated = false;
+      shape.layout.addButton = undefined;
+      shape.layout.title = "Latest Invoices";
+
+      // State changes
+      shape.state.totalPages = 1;
+      shape.state.page = 1;
+    });
+    // Direct rendering, consistent with displayTable method
+    return {
+      status: "success",
+      data: await table.render(),
+      message: "Table rendered successfully",
+    };
+  }
 }

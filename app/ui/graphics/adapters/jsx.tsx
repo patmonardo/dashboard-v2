@@ -127,8 +127,24 @@ export class ShapeToJSXAdapter {
     );
   }
 
-  // Update date field
   static renderDate(field: FormField, data: FormMatter): React.ReactElement {
+    // Format the date for HTML date input (YYYY-MM-DD)
+    let defaultDate = "";
+
+    if (data?.[field.id]) {
+      // If data exists, format it properly
+      const dateObj = new Date(data[field.id]);
+      if (!isNaN(dateObj.getTime())) {
+        defaultDate = dateObj.toISOString().split("T")[0];
+      }
+    } else if (field.defaultValue) {
+      // Try to use field default if no data
+      const dateObj = new Date(field.defaultValue);
+      if (!isNaN(dateObj.getTime())) {
+        defaultDate = dateObj.toISOString().split("T")[0];
+      }
+    }
+
     return (
       <div className="mb-4">
         <label htmlFor={field.id} className="block text-sm font-medium mb-1">
@@ -139,16 +155,15 @@ export class ShapeToJSXAdapter {
           id={field.id}
           name={field.id}
           required={field.required}
-          defaultValue={data?.[field.id]}
+          defaultValue={defaultDate}
           className="w-full rounded-md border border-gray-200 py-2 px-3 text-sm"
         />
       </div>
     );
   }
-
   static renderSelect(field: FormField, data: FormMatter): React.ReactElement {
     // Get the currently selected value from data or default
-    const selectedValue = data?.[field.id] || field.defaultValue || '';
+    const selectedValue = data?.[field.id] || field.defaultValue || "";
 
     return (
       <div className="mb-4">
@@ -157,22 +172,24 @@ export class ShapeToJSXAdapter {
         </label>
         <select
           id={field.id}
-          name={field.id} // Ensure this is set correctly for FormData
+          name={field.id}
           required={field.required}
-          defaultValue={selectedValue}
+          defaultValue={selectedValue} // This handles the selection now
           className="w-full rounded-md border border-gray-200 py-2 px-3 text-sm"
         >
-          {/* Add a placeholder/empty option for required validation */}
+          {/* Placeholder option */}
           {field.required && !selectedValue && (
             <option value="" disabled>
               -- Select {field.label} --
             </option>
           )}
 
+          {/* Remove the selected attribute from options */}
           {field.options?.map((option) => (
             <option
               key={option.value}
               value={option.value}
+              // Remove this line: selected={option.value === selectedValue}
             >
               {option.label}
             </option>

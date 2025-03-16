@@ -12,7 +12,7 @@ describe('InvoiceModel (Database)', () => {
         const createCustomerData: CreateCustomer = {
             name: 'John Doe',
             email: 'john.doe@example.com',
-            imageUrl: 'https://example.com/image.jpg',
+            imageUrl: '/icons/favicon.ico',
         };
 
         let customerId: string | undefined;

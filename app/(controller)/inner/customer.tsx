@@ -1,55 +1,37 @@
 import type { ReactNode } from "react";
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
-import Breadcrumbs from "@/ui/graphics/links/breadcrumbs";
-import Pagination from "@/ui/graphics/links/pagination";
-import Search from "@/ui/graphics/search/search";
+import { revalidatePath } from "next/cache";
 import type { FormHandler } from "@/ui/graphics/schema/form";
-import CustomerTable from "@/ui/graphics/tables/customer";
 import { CustomerModel } from "@/lib/model/customer";
 import { CustomerView } from "@/ui/view/customer";
-import createCustomerAction from "@/(controller)/customers/actions/create";
-import updateCustomerAction from "@/(controller)/customers/actions/update";
-import cancelCustomerAction from "@/(controller)/customers/actions/cancel";
+import { CreateCustomer, UpdateCustomer } from "@/lib/data/schema/customer";
+import createCustomer from "@/(controller)/customers/actions/create";
+import updateCustomer from "@/(controller)/customers/actions/update";
+import cancelCustomer from "@/(controller)/customers/actions/cancel";
 
-// Single controller class for customer operations
 export class CustomerController {
   /**
-   * Renders the customer creation form with breadcrumbs
+   * Displays the customer creation form with breadcrumbs
    */
-  static async create(): Promise<ReactNode> {
+  static async createForm(): Promise<ReactNode> {
     const view = new CustomerView();
-    const result = await view.render("create", "jsx", {
-      submit: createCustomerAction,
-      cancel: cancelCustomerAction,
+    const result = await view.display("create", "jsx", {
+      submit: createCustomer,
+      cancel: cancelCustomer,
     } as FormHandler);
 
     if (result.status === "error") {
       notFound();
     }
 
-    return (
-      <>
-        <Breadcrumbs
-          breadcrumbs={[
-            { label: "Customers", href: "/customers" },
-            {
-              label: "Create Customer",
-              href: "/customers/create",
-              active: true,
-            },
-          ]}
-        />
-        {result.data}
-      </>
-    );
+    return <>{result.data}</>;
   }
 
   /**
    * Renders the customer edit form with breadcrumbs
    * @param id Customer ID
    */
-  static async edit(id: string): Promise<ReactNode> {
+  static async editForm(id: string): Promise<ReactNode> {
     // Fetch the customer data
     const customerResult = await CustomerModel.findById(id);
 
@@ -60,38 +42,109 @@ export class CustomerController {
     const customer = customerResult.data;
     const view = new CustomerView(customer);
 
-    // Fixed: Use updateCustomerAction.bind with id parameter
-    const formResult = await view.render("edit", "jsx", {
-      submit: updateCustomerAction.bind(null, id), // Properly bind id parameter
-      cancel: cancelCustomerAction,
+    const formResult = await view.display("edit", "jsx", {
+      submit: updateCustomer.bind(null, id),
+      cancel: cancelCustomer,
     } as FormHandler);
 
     if (formResult.status === "error") {
       notFound();
     }
 
-    return (
-      <>
-        <Breadcrumbs
-          breadcrumbs={[
-            { label: "Customers", href: "/customers" },
-            {
-              label: `Edit ${customer.name}`,
-              href: `/customers/${id}/edit`,
-              active: true,
-            },
-          ]}
-        />
-        {formResult.data}
-      </>
-    );
+    return <>{formResult.data}</>;
+  }
+
+  /**
+   * Cancels the customer creation or editing
+   */
+  static async cancelCustomer() {
+    revalidatePath("/customers");
+    redirect("/customers");
+  }
+
+  static async createCustomer(formData: FormData) {
+    try {
+      // Extract data from form
+      const name = formData.get("name") as string;
+      const email = formData.get("email") as string;
+      const imageUrl = (formData.get("imageUrl") as string) || null;
+
+      // Validate data
+      if (!name || !email) {
+        return {
+          error: "Name and email are required",
+        };
+      }
+
+      // Create customer in database
+      const result = await CustomerModel.create({
+        name,
+        email,
+        imageUrl,
+      } as CreateCustomer);
+
+      if (result.status !== "success") {
+        return {
+          error: result.message || "Failed to create customer",
+        };
+      }
+
+      // Clear page cache
+      revalidatePath("/customers");
+    } catch (error) {
+      console.error("Error creating customer:", error);
+      return {
+        error: "An unexpected error occurred",
+      };
+    }
+
+    // Redirect to customer list
+    redirect("/customers");
+  }
+
+  /**
+   * Updates a customer
+   * @param id Customer ID
+   * @param formData Form data
+   */
+  static async updateCustomer(id: string, formData: FormData) {
+    try {
+      // Extract data from the form
+      const name = formData.get("name") as string;
+      const email = formData.get("email") as string;
+      const imageUrl = (formData.get("imageUrl") as string) || null;
+
+      // Update in database
+      const result = await CustomerModel.update(id, {
+        name,
+        email,
+        imageUrl,
+      } as UpdateCustomer);
+
+      if (result.status !== "success") {
+        return {
+          error: result.message || "Failed to update customer",
+        };
+      }
+
+      // Clear page cache
+      revalidatePath("/customers");
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      return {
+        error: "An unexpected error occurred",
+      };
+    }
+
+    // Redirect back to list
+    redirect("/customers");
   }
 
   /**
    * Deletes a customer
    * @param id Customer ID
    */
-  static async delete(id: string): Promise<void> {
+  static async deleteCustomer(id: string): Promise<void> {
     // Fetch the customer data
     const result = await CustomerModel.delete(id);
 
@@ -109,43 +162,35 @@ export class CustomerController {
    * @param page Page number
    * @param pageSize Items per page
    */
-  static async list(query = "", page = 1, pageSize = 10): Promise<ReactNode> {
-    const result = await CustomerModel.findAll({ query, page, pageSize });
+  // In CustomerController.tsx (or wherever your controller is)
+  static async listCustomers(query = "", page = 1): Promise<ReactNode> {
+    // Fetch data with pagination and search
+    const result = await CustomerModel.findAll({ query, page, pageSize: 10 });
 
     if (result.status !== "success") {
       return (
         <div className="text-center p-4">
-          <h2 className="text-xl font-semibold">Error loading customers</h2>
+          <h2 className="text-xl font-semibold">Error</h2>
           <p className="text-gray-500">{result.message}</p>
         </div>
       );
     }
 
-    return (
-      <>
-        <Breadcrumbs
-          breadcrumbs={[
-            { label: "Customers", href: "/customers", active: true },
-          ]}
-        />
-        <div className="flex w-full items-center justify-between">
-          <h1 className="text-2xl font-semibold">Customers</h1>
-          <Link
-            href="/customers/create"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Add Customer
-          </Link>
+    // Get total pages
+    const totalPages = await this.totalPages();
+
+    // Use the view to display the table
+    const view = new CustomerView();
+    const displayResult = await view.displayTable(result.data, totalPages);
+    if (displayResult.status === "error") {
+      return (
+        <div className="text-center p-4">
+          <h2 className="text-xl font-semibold">Error</h2>
+          <p className="text-gray-500">{displayResult.message}</p>
         </div>
-        <div className="mt-4 flex items-center justify-between gap-2">
-          <Search placeholder="Search customers..." />
-        </div>
-        <CustomerTable customers={result.data} />
-        <div className="mt-5 flex w-full justify-center">
-          <Pagination totalPages={await this.totalPages()} />
-        </div>
-      </>
-    );
+      );
+    }
+    return <>{displayResult.data}</>;
   }
 
   /**

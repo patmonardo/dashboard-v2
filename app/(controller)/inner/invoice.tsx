@@ -1,55 +1,37 @@
 import type { ReactNode } from "react";
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
-import Breadcrumbs from "@/ui/graphics/links/breadcrumbs";
-import Pagination from "@/ui/graphics/links/pagination";
-import Search from "@/ui/graphics/search/search";
+import { revalidatePath } from "next/cache";
 import type { FormHandler } from "@/ui/graphics/schema/form";
-import InvoiceTable from "@/ui/graphics/tables/invoice";
 import { InvoiceModel } from "@/lib/model/invoice";
 import { InvoiceView } from "@/ui/view/invoice";
-import createInvoiceAction from "@/(controller)/invoices/actions/create";
-import updateInvoiceAction from "@/(controller)/invoices/actions/update";
-import cancelInvoiceAction from "@/(controller)/invoices/actions/cancel";
+import { CreateInvoice, UpdateInvoice } from "@/lib/data/schema/invoice";
+import createInvoice from "@/(controller)/invoices/actions/create";
+import updateInvoice from "@/(controller)/invoices/actions/update";
+import cancelInvoice from "@/(controller)/invoices/actions/cancel";
 
-// Single controller class for invoice operations
 export class InvoiceController {
   /**
-   * Renders the invoice creation form with breadcrumbs
+   * Displays the invoice creation form with breadcrumbs
    */
-  static async create(): Promise<ReactNode> {
+  static async createForm(): Promise<ReactNode> {
     const view = new InvoiceView();
-    const result = await view.render("create", "jsx", {
-      submit: createInvoiceAction,
-      cancel: cancelInvoiceAction,
+    const result = await view.display("create", "jsx", {
+      submit: createInvoice,
+      cancel: cancelInvoice,
     } as FormHandler);
 
     if (result.status === "error") {
       notFound();
     }
 
-    return (
-      <>
-        <Breadcrumbs
-          breadcrumbs={[
-            { label: "Invoices", href: "/invoices" },
-            {
-              label: "Create Invoice",
-              href: "/invoices/create",
-              active: true,
-            },
-          ]}
-        />
-        {result.data}
-      </>
-    );
+    return <>{result.data}</>;
   }
 
   /**
    * Renders the invoice edit form with breadcrumbs
    * @param id Invoice ID
    */
-  static async edit(id: string): Promise<ReactNode> {
+  static async editForm(id: string): Promise<ReactNode> {
     // Fetch the invoice data
     const invoiceResult = await InvoiceModel.findById(id);
 
@@ -60,38 +42,150 @@ export class InvoiceController {
     const invoice = invoiceResult.data;
     const view = new InvoiceView(invoice);
 
-    // Fixed: Use updateInvoiceAction.bind with id parameter
-    const formResult = await view.render("edit", "jsx", {
-      submit: updateInvoiceAction.bind(null, id), // Properly bind id parameter
-      cancel: cancelInvoiceAction,
+    const formResult = await view.display("edit", "jsx", {
+      submit: updateInvoice.bind(null, id),
+      cancel: cancelInvoice,
     } as FormHandler);
 
     if (formResult.status === "error") {
       notFound();
     }
 
-    return (
-      <>
-        <Breadcrumbs
-          breadcrumbs={[
-            { label: "Invoices", href: "/invoices" },
-            {
-              label: `Edit Invoice #${id}`,
-              href: `/invoices/${id}/edit`,
-              active: true,
-            },
-          ]}
-        />
-        {formResult.data}
-      </>
-    );
+    return <>{formResult.data}</>;
+  }
+
+  /**
+   * Cancels the invoice creation or editing
+   */
+  static async cancelInvoice() {
+    revalidatePath("/invoices");
+    redirect("/invoices");
+  }
+
+  static async createInvoice(formData: FormData) {
+    try {
+      // Extract data from form
+      const customerId = formData.get("customerId") as string;
+      const amountStr = formData.get("amount") as string;
+      const dateStr = formData.get("date") as string;
+      const status = formData.get("status") as string;
+
+      // Validate data
+      if (!customerId || !amountStr || !dateStr || !status) {
+        return {
+          error: "All fields are required",
+        };
+      }
+
+      // Convert and validate numeric/date values
+      const amount = Number(amountStr);
+      if (isNaN(amount) || amount <= 0) {
+        return {
+          error: "Amount must be a positive number",
+        };
+      }
+
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        return {
+          error: "Invalid date format",
+        };
+      }
+
+      // Create invoice in database
+      const result = await InvoiceModel.create({
+        customerId,
+        amount,
+        date,
+        status,
+      } as CreateInvoice);
+
+      if (result.status !== "success") {
+        return {
+          error: result.message || "Failed to create invoice",
+        };
+      }
+
+      // Clear page cache
+      revalidatePath("/invoices");
+    } catch (error) {
+      console.error("Error creating invoice:", error);
+      return {
+        error: "An unexpected error occurred",
+      };
+    }
+  }
+
+  /**
+   * Updates a customer
+   * @param id InvoiceCreateInvoice ID
+   * @param formData Form data
+   */
+  static async updateInvoice(id: string, formData: FormData) {
+    try {
+      // Extract data from form
+      const customerId = formData.get("customerId") as string;
+      const amountStr = formData.get("amount") as string;
+      const dateStr = formData.get("date") as string;
+      const status = formData.get("status") as string;
+
+      // Validate required fields
+      if (!customerId || !amountStr || !dateStr || !status) {
+        return {
+          status: "error",
+          message: "All fields are required",
+        };
+      }
+
+      // Convert and validate numbers and dates
+      const amount = Number(amountStr);
+      const date = new Date(dateStr);
+
+      if (isNaN(amount) || amount <= 0) {
+        return {
+          status: "error",
+          message: "Amount must be a positive number",
+        };
+      }
+
+      if (isNaN(date.getTime())) {
+        return {
+          status: "error",
+          message: "Invalid date format",
+        };
+      }
+
+      // Update invoice in database
+      const result = await InvoiceModel.update(id, {
+        customerId,
+        amount,
+        date,
+        status,
+      } as UpdateInvoice);
+
+      if (result.status === "error") {
+        return {
+          status: "error",
+          message: result.message || "Failed to update invoice",
+        };
+      }
+
+      // Clear page cache
+      revalidatePath("/invoices");
+    } catch (error) {
+      console.error("Error updating invoice:", error);
+      return {
+        status: "error",
+        message: "An unexpected error occurred",
+      };
+    }
   }
 
   /**
    * Deletes an invoice
    * @param id Invoice ID
    */
-  static async delete(id: string): Promise<void> {
+  static async deleteInvoice(id: string): Promise<void> {
     // Fetch the customer data
     const result = await InvoiceModel.delete(id);
 
@@ -99,7 +193,7 @@ export class InvoiceController {
       notFound();
     }
     if (result.status === "success") {
-      redirect("/customers");
+      redirect("/invoices");
     }
   }
 
@@ -109,49 +203,37 @@ export class InvoiceController {
    * @param page Page number
    * @param pageSize Items per page
    */
-  static async list(query = "", page = 1, pageSize = 10): Promise<ReactNode> {
+  static async listInvoices(
+    query = "",
+    page = 1,
+    pageSize = 10
+  ): Promise<ReactNode> {
     const result = await InvoiceModel.findAll({ query, page, pageSize });
-
-    if (result.status !== "success") {
+    if (result.status !== "success" || !result.data) {
       return (
         <div className="text-center p-4">
-          <h2 className="text-xl font-semibold">Error loading invoices</h2>
+          <h2 className="text-xl font-semibold">Error fetching invoice list</h2>
           <p className="text-gray-500">{result.message}</p>
         </div>
       );
     }
 
-    return (
-      <>
-        <Breadcrumbs
-          breadcrumbs={[{ label: "Invoices", href: "/invoices", active: true }]}
-        />
-        <div className="flex w-full items-center justify-between">
-          <h1 className="text-2xl font-semibold">Invoices</h1>
-          <Link
-            href="/invoices/create"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Create Invoice
-          </Link>
-        </div>
-        <div className="mt-4 flex items-center justify-between gap-2">
-          <Search placeholder="Search invoices..." />
-        </div>
-        <InvoiceTable invoices={result.data} />
-        <div className="mt-5 flex w-full justify-center">
-          <Pagination totalPages={await this.totalPages()} />
-        </div>
-      </>
-    );
-  }
+    // Create a view to transform domain objects to UI schema
+    const view = new InvoiceView();
 
-  /**
-   * Get total pages for pagination
-   */
-  static async totalPages(pageSize = 10): Promise<number> {
-    const totalInvoices = await InvoiceModel.count();
-    return Math.ceil(totalInvoices / pageSize);
+    // Transform invoices to list schema
+    const displayResult = await view.displayTable(result.data);
+
+    if (displayResult.status !== "success" || !displayResult.data) {
+      return (
+        <div className="text-center p-4">
+          <h2 className="text-xl font-semibold">Error creating invoice list</h2>
+          <p className="text-gray-500">{displayResult.message}</p>
+        </div>
+      );
+    }
+
+    return <>{displayResult.data}</>;
   }
 
   static async latestInvoices() {
@@ -161,11 +243,39 @@ export class InvoiceController {
       console.error("Error fetching latest invoices:", result.message);
       return null;
     }
-    const display = await InvoiceView.displayInvoices(result.data);
-    if (display.status !== "success") {
-      console.error("Error displaying latest invoices:", result.message);
-      return null;
+
+    // Create a view to transform domain objects to UI schema
+    const view = new InvoiceView();
+
+    // Transform invoices to list schema
+    const displayResult = await view.displayLatest(result.data);
+
+    if (displayResult.status !== "success" || !displayResult.data) {
+      return (
+        <div className="text-center p-4">
+          <h2 className="text-xl font-semibold">Error creating invoice list</h2>
+          <p className="text-gray-500">{displayResult.message}</p>
+        </div>
+      );
     }
-    return <>{display.data}</>;
+
+    return <>{displayResult.data}</>;
+  }
+
+  /**
+   * Get total pages for pagination
+   */
+  static async totalPages(pageSize = 10): Promise<number> {
+    const result = await InvoiceModel.count();
+    if (result.status !== "success" || !result.data) {
+      console.error("Error counting invoices:", result.message);
+      return 0;
+    }
+    const totalInvoices = result.data;
+    if (totalInvoices === 0) {
+      return 0;
+    }
+    // Calculate total pages
+    return Math.ceil(totalInvoices / pageSize);
   }
 }

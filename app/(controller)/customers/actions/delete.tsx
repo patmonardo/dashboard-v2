@@ -1,17 +1,10 @@
-//@/(controller)/customers/actions/delete.tsx
 "use server";
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
-import { CustomerModel } from '@/lib/model/customer';
+import { CustomerController } from "@/(controller)/inner/customer";
 
+/**
+ * Server action that proxies to the controller method for deleting a customer
+ */
 export default async function deleteCustomer(id: string) {
-  const result = await CustomerModel.delete(id);
-  if (result.status === 'error') {
-      return {
-        message: result.message || "Database Error: Failed to Delete Customer.",
-      };
-  }
-  revalidatePath('/customers');
-  redirect('/customers');
+  return CustomerController.deleteCustomer(id);
 }

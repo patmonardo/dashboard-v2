@@ -1,23 +1,35 @@
-//@/ui/view/customer.ts
-import { Customer } from '@/lib/data/schema/customer';
-import { CustomerForm } from '@/ui/graphics/forms/customer';
-import { CustomerFormShape } from '@/ui/graphics/schema/customer';
-import { FormView } from './form';
+//@/ui/view/customer.ts7
+import { ReactNode } from "react";
+import { OperationResult } from "@/lib/data/schema/base";
+import { Customer } from "@/lib/data/schema/customer";
+import { CustomerFormShape } from "@/ui/graphics/schema/customer";
+import { CustomerForm } from "@/ui/graphics/forms/customer";
+import { CustomerTable } from "@/ui/graphics/tables/customer";
+import { FormView } from "./form";
 
 export class CustomerView extends FormView<CustomerFormShape> {
   constructor(private readonly customer?: Customer) {
     super(new CustomerForm(customer));
   }
 
-  update(): void {
-    // Implement the update method to update the customer form
-  }
+  public async displayTable(
+    customers: Customer[],
+    totalPages = 1
+  ): Promise<OperationResult<ReactNode>> {
+    // Create the specialized table
+    const table = new CustomerTable(customers);
 
-  async handleSubmit(): Promise<void> {
-    // Implement the handleSubmit method to handle form submission
-  }
+    // Set pagination in the shape
+    table.withTransformations((shape) => {
+      shape.state.totalPages = totalPages;
+      shape.state.page = 1; // Default to first page
+    });
 
-  handleCancel(): void {
-    // Implement the handleCancel method to handle form cancellation
+    // Direct rendering - no dependency on parent class
+    return {
+      status: "success",
+      data: await table.render(),
+      message: "Table rendered successfully",
+    };
   }
 }

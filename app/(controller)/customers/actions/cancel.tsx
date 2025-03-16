@@ -1,11 +1,10 @@
-//@/(controller)/customers/actions/cancel.tsx
 "use server";
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { CustomerController } from "@/(controller)/inner/customer";
 
-// Cancel Customer action
-export default async function cancelCustomer() {
-  revalidatePath('/customers');
-  redirect('/customers');
+/**
+ * Server action that proxies to the controller method for canceling operations
+ */
+export default async function cancel() {
+  return CustomerController.cancelCustomer();
 }

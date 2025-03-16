@@ -6,6 +6,7 @@
     "prisma-studio": "prisma studio",
     "ps": "prisma studio",
     "b": "pnpm run build",
+    "d": "pnpm run dev",
     "dx:next": "run-s migrate-dev && next dev",
     "dx:prisma-studio": "pnpm prisma-studio",
     "dx": "run-p dx:* --print-label",
@@ -43,7 +44,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.26.1",
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^5.12.1",
     "@tanstack/react-query-devtools": "^5.64.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",

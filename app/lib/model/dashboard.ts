@@ -18,7 +18,7 @@ export class DashboardModel {
   static async getCardData(): Promise<CardData> {
     try {
       const numberOfCustomers = await CustomerModel.count();
-      const numberOfInvoices = await InvoiceModel.count();
+      const numberOfInvoices = 1 // await InvoiceModel.count();
       const totalPaidInvoices = await InvoiceModel.getTotalByStatus("PAID");
       const totalPendingInvoices = await InvoiceModel.getTotalByStatus("PENDING");
 

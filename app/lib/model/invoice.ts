@@ -228,12 +228,21 @@ export class InvoiceModel extends BaseModel<InvoiceShape> {
     }
   }
 
-  static async count(): Promise<number> {
+  static async count(): Promise<OperationResult<number>> {
     try {
-      return await prisma.invoice.count();
+      const count = await prisma.invoice.count();
+      return {
+        data: count,
+        status: "success",
+        message: "Count retrieved successfully"
+      };
     } catch (error) {
       console.error("Error counting invoices:", error);
-      return 0;
+      return {
+        data: null,
+        status: "error",
+        message: "Failed to retrieve count"
+      };
     }
   }
 

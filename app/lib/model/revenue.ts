@@ -162,12 +162,21 @@ export class RevenueModel {
     }
   }
 
-  static async count(): Promise<number> {
+  static async count(): Promise<OperationResult<number>> {
     try {
-      return await prisma.revenue.count();
+      const count = await prisma.revenue.count();
+      return {
+        data: count,
+        status: "success",
+        message: "Count retrieved successfully"
+      };
     } catch (error) {
       console.error("Error counting revenues:", error);
-      return 0;
+      return {
+        data: null,
+        status: "error",
+        message: "Failed to retrieve count"
+      };
     }
   }
 

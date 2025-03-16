@@ -1,26 +1,46 @@
-//@/ui/view/form.tsx
-import { Form } from '@/ui/graphics/forms/form'
-import type  { FormShape, FormMode, FormContent, FormHandler } from '@/ui/graphics/schema/form'
-import type { OperationResult } from '@/lib/data/schema/base';
+//@/ui/view/form.ts
+import { ReactNode } from "react";
+import type { OperationResult } from "@/lib/data/schema/base";
+import type {
+  FormShape,
+  FormMode,
+  FormContent,
+  FormHandler,
+} from "@/ui/graphics/schema/form";
+import { Form } from "@/ui/graphics/forms/form";
 
-export abstract class FormView<T extends FormShape> {
-  constructor(protected readonly form: Form<T>) {}
+export class FormView<T extends FormShape> {
+  constructor(protected readonly form?: Form<T>) {}
 
-  public async render(
+  /**
+   * Display a form with the given mode and handler
+   */
+  public async display(
     mode: FormMode,
-    content: FormContent,
+    content: FormContent = "jsx",
     handler: FormHandler
-  ): Promise<OperationResult<any>> {
-    let form: any;
-    switch (content) {
-      case 'jsx':
-      case 'json':
-      case 'html':
-      case 'xml':
-        return await this.form.render(mode, content, handler);
-      default:
-        throw new Error(`Unsupported content type: ${content}`);
+  ): Promise<OperationResult<ReactNode | string>> {
+    if (!this.form) {
+      return {
+        status: "error",
+        data: null,
+        message: "No form available for display",
+      };
+    }
+
+    try {
+      const rendered = await this.form.render(mode, content, handler);
+      return {
+        status: "success",
+        data: rendered,
+        message: "Form rendered successfully",
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        data: null,
+        message: `Form render error: ${error}`,
+      };
     }
   }
-
 }

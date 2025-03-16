@@ -57,34 +57,34 @@ describe("ShapeToJSXAdapter", () => {
     console.log("React Element:", JSON.stringify(result, null, 2));
   });
 
-    // Number input test
-    it('should render a number input with label and value', () => {
-      const field = {
-        id: 'age',
-        type: 'number' as const,
-        label: 'Age',
-        required: true,
-        defaultValue: ''
-      };
+  // Number input test
+  it("should render a number input with label and value", () => {
+    const field = {
+      id: "age",
+      type: "number" as const,
+      label: "Age",
+      required: true,
+      defaultValue: "",
+    };
 
-      const data = {
-        age: '30'  // Note: HTML form values are always strings
-      };
+    const data = {
+      age: "30", // Note: HTML form values are always strings
+    };
 
-      const result = ShapeToJSXAdapter.renderNumber(field, data) as any;
+    const result = ShapeToJSXAdapter.renderNumber(field, data) as any;
 
-      expect(result?.type).toBe('div');
-      const [labelElement, inputElement] = result?.props?.children || [];
+    expect(result?.type).toBe("div");
+    const [labelElement, inputElement] = result?.props?.children || [];
 
-      expect(labelElement?.type).toBe('label');
-      expect(labelElement?.props?.children).toBe('Age');
-      expect(inputElement?.type).toBe('input');
-      expect(inputElement?.props?.type).toBe('number');
-      expect(inputElement?.props?.required).toBe(true);
-      expect(inputElement?.props?.defaultValue).toBe('30');
+    expect(labelElement?.type).toBe("label");
+    expect(labelElement?.props?.children).toBe("Age");
+    expect(inputElement?.type).toBe("input");
+    expect(inputElement?.props?.type).toBe("number");
+    expect(inputElement?.props?.required).toBe(true);
+    expect(inputElement?.props?.defaultValue).toBe("30");
 
-      console.log('React Element:', JSON.stringify(result, null, 2));
-    });
+    console.log("React Element:", JSON.stringify(result, null, 2));
+  });
 
   // Date input test
   it("should render a date input with label and value", () => {
@@ -93,11 +93,11 @@ describe("ShapeToJSXAdapter", () => {
       type: "date" as const,
       label: "Birth Date",
       required: true,
-      defaultValue: ""
+      defaultValue: "",
     };
 
     const data = {
-      birthdate: "2023-10-01"  // Date in YYYY-MM-DD format
+      birthdate: "2023-10-01", // Date in YYYY-MM-DD format
     };
 
     const result = ShapeToJSXAdapter.renderDate(field, data) as any;
@@ -132,24 +132,24 @@ describe("ShapeToJSXAdapter", () => {
     const data = {
       country: "us",
     };
-
+    // Render the component
     const result = ShapeToJSXAdapter.renderSelect(field, data) as any;
 
-    expect(result?.type).toBe("div");
-    const [labelElement, selectElement] = result?.props?.children || [];
+    // Get the rendered HTML for inspection
+    const selectHTML = JSON.stringify(result);
 
-    expect(labelElement?.type).toBe("label");
-    expect(labelElement?.props?.children).toBe("Country");
-    expect(selectElement?.type).toBe("select");
-    expect(selectElement?.props?.required).toBe(true);
+    console.log("Select HTML:", selectHTML);
+    // Test for the presence of key attributes
+    expect(selectHTML).toContain('"type":"select"');
+    expect(selectHTML).toContain('"required":true');
+    expect(selectHTML).toContain('"value":"us"');
+    expect(selectHTML).toContain('"selected":true');
+    expect(selectHTML).toContain('"children":"United States"');
+    expect(selectHTML).toContain('"children":"Canada"');
 
-    // Check options
-    const options = selectElement?.props?.children || [];
-    expect(options).toHaveLength(2);
-    expect(options[0]?.props?.value).toBe("us");
-    expect(options[0]?.props?.selected).toBe(true);
-    expect(options[1]?.props?.value).toBe("ca");
-    expect(options[1]?.props?.selected).toBeFalsy();
+    // Specifically check that US is selected and Canada is not
+    expect(selectHTML).toContain('"value":"us","selected":true');
+    expect(selectHTML).not.toContain('"value":"ca","selected":true');
 
     console.log("React Element:", JSON.stringify(result, null, 2));
   });

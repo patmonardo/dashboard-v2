@@ -1,16 +1,17 @@
 //@/ui/graphics/forms/customer.tsx
-import type { OperationResult } from "@/lib/data/schema/base";
 import type { Customer } from "@/lib/data/schema/customer";
 import type { CustomerFormShape } from "@/ui/graphics/schema/customer";
 import { CustomerFormShapeSchema } from "@/ui/graphics/schema/customer";
-import { Form } from "./form";
+import { Form } from "@/ui/graphics/forms/form";
 
 export class CustomerForm extends Form<CustomerFormShape> {
   constructor(private readonly customer?: Customer) {
     super(customer);
   }
 
-  private async getFormShape(mode: "create" | "edit"): Promise<CustomerFormShape> {
+  private async getFormShape(
+    mode: "create" | "edit"
+  ): Promise<CustomerFormShape> {
     const isCreate = mode === "create";
 
     return CustomerFormShapeSchema.parse({
@@ -44,21 +45,21 @@ export class CustomerForm extends Form<CustomerFormShape> {
           type: "text",
           label: "Name",
           required: true,
-          defaultValue: isCreate ? "" : (this.customer?.name || ""),
+          defaultValue: isCreate ? "" : this.customer?.name || "",
         },
         {
           id: "email",
           type: "email",
           label: "Email",
           required: true,
-          defaultValue: isCreate ? "" : (this.customer?.email || ""),
+          defaultValue: isCreate ? "" : this.customer?.email || "",
         },
         {
           id: "imageUrl",
           type: "text",
           label: "Image URL",
           required: false,
-          defaultValue: isCreate ? "" : (this.customer?.imageUrl || ""),
+          defaultValue: isCreate ? "" : this.customer?.imageUrl || "",
         },
       ],
       state: {
@@ -67,37 +68,11 @@ export class CustomerForm extends Form<CustomerFormShape> {
     });
   }
 
-  async create(): Promise<OperationResult<CustomerFormShape>> {
-    try {
-      const shape = await this.getFormShape("create");
-      return {
-        data: shape,
-        status: "success",
-        message: "Form created successfully",
-      };
-    } catch {
-      return {
-        data: null,
-        status: "error",
-        message: "Invalid form configuration",
-      };
-    }
+  async createForm(): Promise<CustomerFormShape> {
+    return await this.getFormShape("create");
   }
 
-  async edit(): Promise<OperationResult<CustomerFormShape>> {
-    try {
-      const shape = await this.getFormShape("edit");
-      return {
-        data: shape,
-        status: "success",
-        message: "Form updated successfully", // Fixed message
-      };
-    } catch {
-      return {
-        data: null,
-        status: "error",
-        message: "Invalid form configuration", // Fixed message
-      };
-    }
+  async editForm(): Promise<CustomerFormShape> {
+    return await this.getFormShape("edit");
   }
 }

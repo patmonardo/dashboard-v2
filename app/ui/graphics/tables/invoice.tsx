@@ -1,140 +1,220 @@
+//@/ui/view/invoice.ts
+import { ReactNode } from "react";
 import Image from "next/image";
-import DeleteInvoiceButton from "@/(controller)/invoices/buttons/delete";
-import UpdateInvoiceButton from "@/(controller)/invoices/buttons/update";
-import InvoiceStatus from "@/(controller)/invoices/status";
-import { formatCurrency, formatDateToLocal } from "@/lib/data/formatting";
 import { InvoiceWithCustomer } from "@/lib/data/schema/invoice";
+import {
+  TableColumn,
+  TableLayout,
+  TableShape,
+} from "@/ui/graphics/schema/table";
+import { defineTable } from "@/ui/graphics/schema/table";
+import { ButtonRenderer } from "@/ui/graphics/buttons/renderer";
+import { Table } from "./table";
+import InvoiceStatus from "@/(controller)/invoices/status";
 
 const DEFAULT_IMAGE = "/icons/favicon.ico";
+export class InvoiceTable extends Table<TableShape> {
+  constructor(
+    invoices: InvoiceWithCustomer[],
+    options?: { overrideLayout?: Partial<TableLayout> }
+  ) {
+    super(invoices);
 
-interface InvoiceTableProps {
-  invoices: InvoiceWithCustomer[];
-}
+    // Apply layout overrides if provided using the new transformation pattern
+    if (options?.overrideLayout) {
+      this.withTransformations((shape) => {
+        shape.layout = {
+          ...shape.layout,
+          ...options.overrideLayout,
+        };
+      });
+    }
+  }
 
-export default function InvoiceTable({ invoices }: InvoiceTableProps) {
-  return (
-    <div className="mt-6 flow-root">
-      <div className="inline-block min-w-full align-middle">
-        <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
-          {/* Mobile view */}
-          <div className="md:hidden">
-            {invoices?.length ? (
-              invoices.map((invoice) => (
-                <div
-                  key={invoice.id}
-                  className="mb-2 w-full rounded-md bg-white p-4"
-                >
-                  <div className="flex items-center justify-between border-b pb-4">
-                    <div>
-                      <div className="mb-2 flex items-center">
-                        <Image
-                          src={invoice.customer.imageUrl || DEFAULT_IMAGE}
-                          className="mr-2 rounded-full"
-                          width={28}
-                          height={28}
-                          alt={`${invoice.customer.name}'s profile picture`}
-                        />
-                        <p>{invoice.customer.name}</p>
-                      </div>
-                      <p className="text-sm text-gray-500">
-                        {invoice.customer.email}
-                      </p>
-                    </div>
-                    <InvoiceStatus status={invoice.status} />
-                  </div>
-                  <div className="flex w-full items-center justify-between pt-4">
-                    <div>
-                      <p className="text-xl font-medium">
-                        {formatCurrency(invoice.amount)}
-                      </p>
-                      <p>{formatDateToLocal(invoice.date)}</p>
-                    </div>
-                    <div className="flex justify-end gap-3">
-                      <UpdateInvoiceButton id={invoice.id} />
-                      <DeleteInvoiceButton id={invoice.id} />
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center py-4">No invoices found</p>
-            )}
+  // Change to defineShape instead of getTableShape
+  protected defineShape(): TableShape {
+    return defineTable({
+      columns: [
+        {
+          key: "customer",
+          label: "Customer",
+          className: "text-left",
+          width: "auto",
+          sortable: true,
+          filterable: true,
+        },
+        // Other columns remain the same...
+      ],
+      layout: {
+        title: "Invoices",
+        responsive: true,
+        searchable: true,
+        paginated: true,
+        striped: false,
+        hoverable: true,
+        addButton: {
+          label: "Create Invoice",
+          href: "/invoices/create",
+          icon: "plus",
+        },
+      },
+      state: {
+        status: "idle",
+        page: 1,
+        totalPages: 1,
+        message: undefined,
+        sortColumn: undefined,
+        sortDirection: undefined,
+      },
+      actions: [
+        { id: "edit", type: "edit", label: "Edit", icon: "pencil" },
+        { id: "delete", type: "delete", label: "Delete", icon: "trash" },
+      ],
+    });
+  }
+
+  // Override to provide custom cell rendering
+  public renderCell(
+    column: TableColumn,
+    invoice: InvoiceWithCustomer
+  ): ReactNode {
+    switch (column.key) {
+      case "customer":
+        return (
+          <div className="flex items-center gap-3">
+            <Image
+              src={invoice.customer.imageUrl || DEFAULT_IMAGE}
+              className="rounded-full"
+              width={28}
+              height={28}
+              alt={`${invoice.customer.name}'s profile picture`}
+            />
+            <p>{invoice.customer.name}</p>
           </div>
+        );
+      case "email":
+        return invoice.customer.email;
+      case "amount":
+        return this.formatCurrency(invoice.amount);
+      case "date":
+        return this.formatDate(invoice.date);
+      case "status":
+        return <InvoiceStatus status={invoice.status} />;
+      default:
+        return super.renderCell(column, invoice);
+    }
+  }
 
-          {/* Desktop view */}
-          <table className="hidden min-w-full text-gray-900 md:table">
-            <thead className="rounded-lg text-left text-sm font-normal">
-              <tr>
-                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Customer
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Email
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Amount
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Date
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Status
-                </th>
-                <th scope="col" className="relative py-3 pl-6 pr-3">
-                  <span className="sr-only">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white">
-              {invoices?.length ? (
-                invoices.map((invoice) => (
-                  <tr
-                    key={invoice.id}
-                    className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
-                  >
-                    <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                      <div className="flex items-center gap-3">
-                        <Image
-                          src={invoice.customer.imageUrl || DEFAULT_IMAGE}
-                          className="rounded-full"
-                          width={28}
-                          height={28}
-                          alt={`${invoice.customer.name}'s profile picture`}
-                        />
-                        <p>{invoice.customer.name}</p>
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-3">
-                      {invoice.customer.email}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-3">
-                      {formatCurrency(invoice.amount)}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-3">
-                      {formatDateToLocal(invoice.date)}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-3">
-                      <InvoiceStatus status={invoice.status} />
-                    </td>
-                    <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                    <div className="flex justify-end gap-3">
-                      <UpdateInvoiceButton id={invoice.id} />
-                      <DeleteInvoiceButton id={invoice.id} />
-                    </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="text-center py-4">
-                    No invoices found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+  // Update the end of invoice.tsx with a proper renderActions method
+  public renderActions(
+    invoice: InvoiceWithCustomer,
+    actions: any[]
+  ): ReactNode {
+    return (
+      <>
+        {actions.map((action, index) => {
+          // Generate URL based on action type
+          let href = "#";
+          if (action.type === "edit") {
+            href = `/invoices/${invoice.id}/edit`;
+          } else if (action.type === "delete") {
+            href = `/invoices//${invoice.id}/delete`;
+          } else if (action.type === "view") {
+            href = `/invoices/${invoice.id}`;
+          }
+          return (
+            <ButtonRenderer
+              key={index}
+              shape={{
+                variant: action.variant || "secondary",
+                label: action.label,
+                icon: action.icon,
+                href: href,
+                srOnly: true,
+                disabled: false,
+                onClick: undefined,
+                refreshAfterAction: false,
+                confirmMessage: undefined,
+                customClass: undefined,
+                size: "md",
+                iconSource: "heroicons",
+              }}
+            />
+          );
+        })}
+      </>
+    );
+  }
+
+  // Override to provide custom mobile card rendering
+  public renderMobileCard(invoice: InvoiceWithCustomer): ReactNode {
+    return (
+      <>
+        <div className="flex items-center justify-between border-b pb-4">
+          <div>
+            <div className="mb-2 flex items-center">
+              <Image
+                src={invoice.customer.imageUrl || DEFAULT_IMAGE}
+                className="mr-2 rounded-full"
+                width={28}
+                height={28}
+                alt={`${invoice.customer.name}'s profile picture`}
+              />
+              <p>{invoice.customer.name}</p>
+            </div>
+            <p className="text-sm text-gray-500">{invoice.customer.email}</p>
+          </div>
+          <InvoiceStatus status={invoice.status} />
         </div>
+        <div className="flex w-full items-center justify-between pt-4">
+          <div>
+            <p className="text-xl font-medium">
+              {this.formatCurrency(invoice.amount)}
+            </p>
+            <p>{this.formatDate(invoice.date)}</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  formatCurrency(amount: number): React.ReactNode {
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    // Format the amount but we'll use it for display only
+    const formatted = formatter.format(amount);
+
+    // Split the formatted string at the decimal point
+    const [dollars, cents] = formatted.split(".");
+
+    // Return a structured format for better alignment
+    return (
+      <div className="tabular-nums text-right">
+        <span className="dollars">{dollars}</span>
+        <span className="cents text-gray-500">.{cents}</span>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // Add this method to your InvoiceTable class
+  formatDate(date: Date): React.ReactNode {
+    // Get year, month, day with proper padding
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return (
+      <div className="tabular-nums text-right">
+        <span className="month-day">
+          {month}/{day}
+        </span>
+        <span className="year text-gray-500">/{year}</span>
+      </div>
+    );
+  }
 }

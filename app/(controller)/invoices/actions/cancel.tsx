@@ -1,15 +1,10 @@
-//@/(controller)/invoices/actions/cancel.tsx
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { InvoiceState } from "@/lib/data/schema/invoice";
+import { InvoiceController } from "@/(controller)/inner/invoice";
 
-// Cancel invoice
-export default async function cancelInvoice(
-  prev_state: InvoiceState,
-  formData: FormData
-) {
-    revalidatePath("/invoices");
-    redirect("/invoices");
+/**
+ * Server action that proxies to the controller method for canceling operations
+ */
+export default async function cancel() {
+  return InvoiceController.cancelInvoice();
 }

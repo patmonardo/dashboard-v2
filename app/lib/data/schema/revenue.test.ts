@@ -9,6 +9,8 @@ describe("Revenue Schema", () => {
       month: new Date(),
       revenue: 100,
       expenses: 50,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     const result = RevenueSchema.safeParse(validRevenue);
     expect(result.success).toBe(true);
@@ -27,7 +29,7 @@ describe("Revenue Schema", () => {
 
   it("should invalidate a revenue with negative revenue", () => {
     const invalidRevenue = {
-      id: "uuid",
+      id: uuidv4(),
       month: new Date(),
       revenue: -100,
       expenses: 50,

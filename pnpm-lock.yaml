@@ -61,7 +61,7 @@ importers:
         specifier: ^1.26.1
         version: 1.50.1
       '@prisma/client':
-        specifier: ^5.22.0
+        specifier: ^5.12.1
         version: 5.22.0(prisma@5.22.0)
       '@tanstack/react-query-devtools':
         specifier: ^5.64.2

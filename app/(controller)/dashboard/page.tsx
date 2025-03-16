@@ -20,7 +20,6 @@ export default async function Page(props: {
   const page = Number(searchParams?.page) || 1;
   // Fetch card data using the model
   const data = await DashboardModel.getCardData();
-  console.log(data.totalPaidInvoices, data.totalPendingInvoices);
   return (
     <main className="p-6">
       <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>

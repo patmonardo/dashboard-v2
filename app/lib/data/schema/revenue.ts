@@ -1,4 +1,4 @@
-// app/lib/data/schema/revenue.ts
+//@/lib/data/schema/revenue.ts
 import { z } from 'zod'
 import { BaseSchema, BaseStateSchema } from './base'
 
@@ -9,8 +9,8 @@ export const TimeIntervalSchema = z.enum(['day', 'week', 'month', 'quarter', 'ye
 export const RevenueSchema = BaseSchema.extend({
   id: z.string().uuid(),
   month: z.date(),
-  revenue: z.number(),
-  expenses: z.number().optional().default(0)
+  revenue: z.number().positive(),
+  expenses: z.number().positive().optional().default(0)
 })
 
 // State Schema for runtime state and validation

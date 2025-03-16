@@ -1,5 +1,4 @@
 //@/ui/graphics/forms/invoice.tsx
-import type { OperationResult } from "@/lib/data/schema/base";
 import type { Invoice } from "@/lib/data/schema/invoice";
 import { CustomerModel } from "@/lib/model/customer";
 import { InvoiceFormShapeSchema } from "@/ui/graphics/schema/invoice";
@@ -98,39 +97,11 @@ export class InvoiceForm extends Form<InvoiceFormShape> {
     });
   }
 
-  async create(): Promise<OperationResult<InvoiceFormShape>> {
-    try {
-      const shape = await this.getFormShape("create");
-      return {
-        data: shape,
-        status: "success",
-        message: "Form created successfully",
-      };
-    } catch (error) {
-      console.error("Error creating invoice form:", error);
-      return {
-        data: null,
-        status: "error",
-        message: "Invalid form configuration",
-      };
-    }
+  async createForm(): Promise<InvoiceFormShape> {
+    return await this.getFormShape("create");
   }
 
-  async edit(): Promise<OperationResult<InvoiceFormShape>> {
-    try {
-      const shape = await this.getFormShape("edit");
-      return {
-        data: shape,
-        status: "success",
-        message: "Invoice created successfully",
-      };
-    } catch (error) {
-      console.error("Error creating invoice form:", error);
-      return {
-        data: null,
-        status: "error",
-        message: "Invalid invoice configuration",
-      };
-    }
+  async editForm(): Promise<InvoiceFormShape> {
+    return await this.getFormShape("edit");
   }
 }

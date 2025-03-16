@@ -1,6 +1,6 @@
 //@/ui/graphics/links/sidenav.tsx
 import Link from "next/link";
-import NavLinks from "@/ui/graphics/links/navlinks";
+import NavLinks from "@/ui/graphics/lists/navlinks";
 import { AcmeLogo } from "@/ui/graphics/styles/logo";
 import { PowerIcon } from "@heroicons/react/24/outline";
 

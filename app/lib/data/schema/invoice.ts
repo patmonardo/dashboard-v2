@@ -1,3 +1,4 @@
+//@/lib/data/schema/invoice.ts
 import { z } from 'zod';
 import { BaseSchema, BaseStateSchema } from './base';
 import { CustomerSchema } from './customer';
@@ -8,7 +9,7 @@ export const InvoiceStatusSchema = z.enum(["PENDING", "PAID", "OVERDUE", "DRAFT"
 // Core Invoice Schema
 export const InvoiceSchema = BaseSchema.extend({
   customerId: z.string().uuid(),
-  amount: z.number(),
+  amount: z.number().positive(),
   date: z.date(),
   status: InvoiceStatusSchema,
 });
@@ -36,11 +37,15 @@ export const InvoiceShapeSchema = z.object({
 
 // For data entry/updates
 export const CreateInvoiceSchema = InvoiceSchema.omit({
-  id: true
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const UpdateInvoiceSchema = InvoiceSchema.omit({
-  id: true
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 }).partial();
 
 // Type exports
