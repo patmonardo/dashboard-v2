@@ -13,6 +13,7 @@ import { Table } from "./table";
 import InvoiceStatus from "@/(controller)/invoices/status";
 
 const DEFAULT_IMAGE = "/icons/favicon.ico";
+
 export class InvoiceTable extends Table<TableShape> {
   constructor(
     invoices: InvoiceWithCustomer[],
@@ -31,7 +32,6 @@ export class InvoiceTable extends Table<TableShape> {
     }
   }
 
-  // Change to defineShape instead of getTableShape
   protected defineShape(): TableShape {
     return defineTable({
       columns: [
@@ -43,7 +43,38 @@ export class InvoiceTable extends Table<TableShape> {
           sortable: true,
           filterable: true,
         },
-        // Other columns remain the same...
+        {
+          key: "email",
+          label: "Email",
+          className: "text-left",
+          width: "auto",
+          sortable: true,
+          filterable: true,
+        },
+        {
+          key: "date",
+          label: "Date",
+          className: "text-center",
+          width: "auto",
+          sortable: true,
+          filterable: true,
+        },
+        {
+          key: "amount",
+          label: "Amount",
+          className: "text-right",
+          width: "auto",
+          sortable: true,
+          filterable: true,
+        },
+        {
+          key: "status",
+          label: "Status",
+          className: "text-left",
+          width: "auto",
+          sortable: true,
+          filterable: true,
+        },
       ],
       layout: {
         title: "Invoices",
@@ -78,6 +109,7 @@ export class InvoiceTable extends Table<TableShape> {
     column: TableColumn,
     invoice: InvoiceWithCustomer
   ): ReactNode {
+    console.log("Rendering cell for column:", column.key);
     switch (column.key) {
       case "customer":
         return (

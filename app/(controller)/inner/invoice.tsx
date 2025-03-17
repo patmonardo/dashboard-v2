@@ -114,10 +114,11 @@ export class InvoiceController {
         error: "An unexpected error occurred",
       };
     }
+    redirect("/invoices");
   }
 
   /**
-   * Updates a customer
+   * Updates a invoice
    * @param id InvoiceCreateInvoice ID
    * @param formData Form data
    */
@@ -179,6 +180,7 @@ export class InvoiceController {
         message: "An unexpected error occurred",
       };
     }
+    redirect("/invoices");
   }
 
   /**
@@ -221,7 +223,6 @@ export class InvoiceController {
     // Create a view to transform domain objects to UI schema
     const view = new InvoiceView();
 
-    // Transform invoices to list schema
     const displayResult = await view.displayTable(result.data);
 
     if (displayResult.status !== "success" || !displayResult.data) {

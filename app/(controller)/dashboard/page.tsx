@@ -1,3 +1,4 @@
+//@/(controller)/dashboard/page.tsx
 import { Suspense } from "react";
 import { Card } from "@/ui/graphics/cards/card";
 import { InvoiceController } from "@/(controller)/inner/invoice";

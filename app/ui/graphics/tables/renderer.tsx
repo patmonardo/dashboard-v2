@@ -25,7 +25,9 @@ export function TableRenderer<T extends TableShape>({
   const state = shape.state || { status: "idle", page: 1, totalPages: 1 };
 
   return (
-    <div className="flex flex-col w-full"> {/* Add this container */}
+    <div className="flex flex-col w-full">
+      {" "}
+      {/* Add this container */}
       {/* Header section */}
       <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl">{title}</h1>
@@ -39,17 +41,14 @@ export function TableRenderer<T extends TableShape>({
           </Link>
         )}
       </div>
-
       {/* Search */}
       {layout.searchable && (
         <div className="mt-4 mb-8">
           <Search placeholder={`Search ${title.toLowerCase()}...`} />
         </div>
       )}
-
       {/* Table */}
       <TableComponent table={table} shape={shape} data={data} />
-
       {/* Pagination */}
       {layout.paginated && state.totalPages > 0 && (
         <div className="mt-5 flex w-full justify-center">
@@ -101,8 +100,7 @@ function TableComponent<T extends TableShape>({
                 <th
                   key={i}
                   className={`px-3 py-3.5 text-sm font-semibold text-gray-900 ${
-                    // Special case for amount column
-                    ["amount", "date"].includes(column.key)  ? "text-right" : "text-left"
+                    column.className || "text-left"
                   }`}
                 >
                   {column.label}
