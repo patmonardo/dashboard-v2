@@ -1,8 +1,8 @@
 //@/lib/data/formatting.ts
-import { Decimal } from '@prisma/client/runtime/library'
+import { Prisma } from '@prisma/client'
 
-export const formatCurrency = (amount: number | Decimal) => {
-  const numericAmount = amount instanceof Decimal ? amount.toNumber() : amount
+export const formatCurrency = (amount: number | Prisma.Decimal) => {
+  const numericAmount = amount instanceof Prisma.Decimal ? amount.toNumber() : amount
   return (numericAmount / 100).toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
